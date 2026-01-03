@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FEDUS | 2026 Analytics Dashboard</title>
+    <style>
+        :root { 
+            --fedus-blue: #0a111f; 
+            --fedus-green: #27ae60; 
+            --bg: #f4f7f6; 
+            --text-main: #333;
+        }
+        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--text-main); }
+        .container { max-width: 100%; margin: auto; }
+
+        /* Branded Header */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            background: var(--fedus-blue); 
+            padding: 15px 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+        }
+        .logo-area img { height: 40px; display: block; }
+        .sync-pill { 
+            background: rgba(39, 174, 96, 0.15); 
+            color: #2ecc71; 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            font-size: 11px; 
+            font-weight: bold; 
+            border: 1px solid var(--fedus-green); 
+            letter-spacing: 0.5px;
+        }
+
+        /* Analytics Cards */
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { padding: 20px; border-radius: 12px; color: white; text-align: center; position: relative; overflow: hidden; }
+        .stat-card h2 { margin: 0; font-size: 32px; font-weight: 700; }
+        .stat-card p { margin: 5px 0 0; font-size: 12px; text-transform: uppercase; opacity: 0.9; font-weight: 600; }
+        .bg-1 { background: linear-gradient(135deg, #1c2d41 0%, #0a111f 100%); }
+        .bg-2 { background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%); }
+        .bg-3 { background: linear-gradient(135deg, #2980b9 0%, #2471a3 100%); }
+
+        /* Search Bar */
+        .search-box { 
+            background: white; 
+            padding: 12px 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            border: 1px solid #ddd; 
+            display: flex; 
+            align-items: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        #searchInput { width: 100%; border: none; outline: none; font-size: 15px; background: transparent; }
+
+        /* Table Design */
+        .table-wrap { background: white; border-radius: 12px; border: 1px solid #e1e4e8; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .table-scroll { overflow-x: auto; max-height: 650px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+        
+        th { 
+            background: #f8f9fa; 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            color: #586069; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 11px; 
+            letter-spacing: 0.5px; 
+            padding: 15px 12px;
+            border-bottom: 2px solid #edf0f2;
+            text-align: left;
+        }
+
+        td { padding: 14px 12px; border-bottom: 1px solid #f1f3f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        tr:hover { background-color: #f9fbfc; }
+
+        /* Fixed Column Widths for Perfect Layout */
+        .col-dt { width: 140px; } 
+        .col-nm { width: 160px; } 
+        .col-ph { width: 115px; } 
+        .col-em { width: 190px; } 
+        .col-id { width: 150px; } 
+        .col-pl { width: 100px; } 
+        .col-st { width: 130px; } 
+        .col-pn { width: 80px; }
+
+        .platform-badge { background: #e1f5fe; color: #0288d1; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .order-id { color: #2980b9; font-family: monospace; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="FEDUS" onerror="this.innerHTML='FEDUS'; this.style.color='white';">
+        </div>
+        <div id="syncStatus" class="sync-pill">SYNCING 2026 DATA...</div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="stat-card bg-1"><h2 id="totalCount">0</h2><p>Lifetime Orders</p></div>
+        <div class="stat-card bg-2"><h2 id="todayCount">0</h2><p>Today's Entries</p></div>
+        <div class="stat-card bg-3"><h2 id="topPlatform">N/A</h2><p>Recent Platform</p></div>
+    </div>
+
+    <div class="search-box">
+        <span style="margin-right:10px">🔍</span>
+        <input type="text" id="searchInput" placeholder="Filter by Name, Order ID, Phone or State..." onkeyup="filterData()">
+    </div>
+
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-dt">Purchase Date</th>
+                        <th class="col-nm">Full Name</th>
+                        <th class="col-ph">Phone</th>
+                        <th class="col-em">Email</th>
+                        <th class="col-id">Order ID</th>
+                        <th class="col-pl">Platform</th>
+                        <th class="col-st">State</th>
+                        <th class="col-pn">Pin</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // YOUR CSV LINK (Updated with GID)
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=0&single=true&output=csv';
+    
+    let masterData = [];
+
+    async function fetchData() {
+        const status = document.getElementById('syncStatus');
+        try {
+            const response = await fetch(csvUrl + '&cache=' + Date.now());
+            const text = await response.text();
+            masterData = robustParser(text);
+            renderTable(masterData);
+            status.innerText = "LIVE: " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        } catch (err) { status.innerText = "OFFLINE"; }
+    }
+
+    function robustParser(text) {
+        const rows = [];
+        let curRow = [], curVal = '', inQuotes = false;
+        
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i], next = text[i+1];
+            if (char === '"') {
+                if (inQuotes && next === '"') { curVal += '"'; i++; }
+                else inQuotes = !inQuotes;
+            } 
+            else if (char === ',' && !inQuotes) { curRow.push(curVal); curVal = ''; }
+            else if ((char === '\r' || char === '\n') && !inQuotes) {
+                curRow.push(curVal);
+                if (curRow.length > 1) rows.push(curRow);
+                curRow = []; curVal = '';
+                if (char === '\r' && next === '\n') i++;
+            } 
+            else curVal += char;
+        }
+        if (curVal || curRow.length > 0) { curRow.push(curVal); rows.push(curRow); }
+        
+        return rows.slice(1).map(c => ({
+            date: (c[0]||"").trim(),
+            name: (c[1]||"").trim(),
+            phone: (c[2]||"").trim(),
+            email: (c[3]||"").trim(),
+            oid: (c[4]||"").trim(),
+            plat: (c[5]||"").trim(),
+            state: (c[6]||"").trim(),
+            pin: (c[7]||"").trim()
+        })).filter(r => r.name !== "");
+    }
+
+    function renderTable(data, isFiltering = false) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = data.map(r => `
+            <tr>
+                <td class="col-dt" style="color:#666;">${r.date}</td>
+                <td class="col-nm"><strong>${r.name}</strong></td>
+                <td class="col-ph">${r.phone}</td>
+                <td class="col-em" title="${r.email}">${r.email}</td>
+                <td class="col-id" title="${r.oid}"><span class="order-id">${r.oid}</span></td>
+                <td class="col-pl"><span class="platform-badge">${r.plat}</span></td>
+                <td class="col-st"><strong>${r.state}</strong></td>
+                <td class="col-pn">${r.pin}</td>
+            </tr>
+        `).join('');
+
+        if (!isFiltering) {
+            document.getElementById('totalCount').innerText = data.length;
+            if(data.length > 0) document.getElementById('topPlatform').innerText = data[0].plat;
+            
+            // Basic "Today" logic based on last entry
+            const today = new Date().toLocaleDateString();
+            const todayCount = data.filter(d => d.date.includes(today)).length;
+            document.getElementById('todayCount').innerText = todayCount || data.length; 
+        }
+    }
+
+    function filterData() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = masterData.filter(row => 
+            Object.values(row).some(val => val.toLowerCase().includes(query))
+        );
+        renderTable(filtered, true);
+    }
+
+    window.onload = fetchData;
+    setInterval(fetchData, 30000); // Auto-refresh every 30 seconds
+</script>
+</body>
+</html>
