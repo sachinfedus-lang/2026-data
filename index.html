@@ -4,96 +4,46 @@
     <meta charset="UTF-8">
     <title>FEDUS | 2026 Analytics Dashboard</title>
     <style>
-        :root { 
-            --fedus-blue: #0a111f; 
-            --fedus-green: #27ae60; 
-            --bg: #f4f7f6; 
-            --text-main: #333;
-        }
-        
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--text-main); }
+        :root { --fedus-blue: #0a111f; --fedus-green: #27ae60; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         .container { max-width: 100%; margin: auto; }
 
-        /* Branded Header */
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px; 
-            background: var(--fedus-blue); 
-            padding: 15px 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-        }
-        .logo-area img { height: 40px; display: block; }
-        .sync-pill { 
-            background: rgba(39, 174, 96, 0.15); 
-            color: #2ecc71; 
-            padding: 6px 15px; 
-            border-radius: 20px; 
-            font-size: 11px; 
-            font-weight: bold; 
-            border: 1px solid var(--fedus-green); 
-            letter-spacing: 0.5px;
-        }
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: var(--fedus-blue); padding: 15px 30px; border-radius: 12px; color: white; }
+        .logo-area img { height: 40px; }
+        .header-actions { display: flex; gap: 15px; align-items: center; }
+        .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
+        .refresh-btn:hover { background: #1e8449; }
+        .sync-pill { background: rgba(39, 174, 96, 0.2); color: #2ecc71; padding: 6px 12px; border-radius: 20px; font-size: 11px; border: 1px solid var(--fedus-green); }
 
-        /* Analytics Cards */
+        /* Stats */
         .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-card { padding: 20px; border-radius: 12px; color: white; text-align: center; position: relative; overflow: hidden; }
-        .stat-card h2 { margin: 0; font-size: 32px; font-weight: 700; }
-        .stat-card p { margin: 5px 0 0; font-size: 12px; text-transform: uppercase; opacity: 0.9; font-weight: 600; }
-        .bg-1 { background: linear-gradient(135deg, #1c2d41 0%, #0a111f 100%); }
-        .bg-2 { background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%); }
-        .bg-3 { background: linear-gradient(135deg, #2980b9 0%, #2471a3 100%); }
+        .stat-card { padding: 20px; border-radius: 12px; color: white; text-align: center; }
+        .bg-1 { background: #1c2d41; } .bg-2 { background: var(--fedus-green); } .bg-3 { background: #2980b9; }
 
-        /* Search Bar */
-        .search-box { 
-            background: white; 
-            padding: 12px 20px; 
-            border-radius: 10px; 
-            margin-bottom: 20px; 
-            border: 1px solid #ddd; 
-            display: flex; 
-            align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        #searchInput { width: 100%; border: none; outline: none; font-size: 15px; background: transparent; }
+        /* Layout for Breakdown + Table */
+        .main-content { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
 
-        /* Table Design */
-        .table-wrap { background: white; border-radius: 12px; border: 1px solid #e1e4e8; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
-        .table-scroll { overflow-x: auto; max-height: 650px; }
+        /* Breakdown Widget */
+        .breakdown-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .breakdown-box h3 { margin-top: 0; font-size: 16px; color: var(--fedus-blue); border-bottom: 2px solid #f4f7f6; padding-bottom: 10px; }
+        .breakdown-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .breakdown-item:last-child { border: none; }
+        .count-badge { background: #f0f2f5; padding: 2px 10px; border-radius: 10px; font-weight: bold; color: var(--fedus-blue); }
+
+        /* Table */
+        .table-wrap { background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; }
+        .table-scroll { overflow-x: auto; max-height: 600px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-        
-        th { 
-            background: #f8f9fa; 
-            position: sticky; 
-            top: 0; 
-            z-index: 10; 
-            color: #586069; 
-            font-weight: 600; 
-            text-transform: uppercase; 
-            font-size: 11px; 
-            letter-spacing: 0.5px; 
-            padding: 15px 12px;
-            border-bottom: 2px solid #edf0f2;
-            text-align: left;
-        }
+        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; padding: 15px 12px; text-align: left; border-bottom: 2px solid #eee; }
+        td { padding: 12px; border-bottom: 1px solid #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        td { padding: 14px 12px; border-bottom: 1px solid #f1f3f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        tr:hover { background-color: #f9fbfc; }
+        /* Column Widths */
+        .col-dt { width: 130px; } .col-nm { width: 150px; } .col-ph { width: 110px; }
+        .col-em { width: 170px; } .col-id { width: 140px; } .col-pl { width: 90px; }
+        .col-st { width: 120px; } .col-pn { width: 70px; }
 
-        /* Fixed Column Widths for Perfect Layout */
-        .col-dt { width: 140px; } 
-        .col-nm { width: 160px; } 
-        .col-ph { width: 115px; } 
-        .col-em { width: 190px; } 
-        .col-id { width: 150px; } 
-        .col-pl { width: 100px; } 
-        .col-st { width: 130px; } 
-        .col-pn { width: 80px; }
-
-        .platform-badge { background: #e1f5fe; color: #0288d1; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .order-id { color: #2980b9; font-family: monospace; font-weight: bold; }
+        .search-box { background: white; padding: 12px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ddd; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -101,117 +51,116 @@
 <div class="container">
     <div class="header">
         <div class="logo-area">
-            <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="FEDUS" onerror="this.innerHTML='FEDUS'; this.style.color='white';">
+            <img src="logo.png" alt="FEDUS" onerror="this.src='https://via.placeholder.com/120x40?text=FEDUS'">
         </div>
-        <div id="syncStatus" class="sync-pill">SYNCING 2026 DATA...</div>
+        <div class="header-actions">
+            <span id="syncStatus" class="sync-pill">CONNECTING...</span>
+            <button class="refresh-btn" onclick="fetchData()">🔄 REFRESH</button>
+        </div>
     </div>
 
     <div class="summary-grid">
         <div class="stat-card bg-1"><h2 id="totalCount">0</h2><p>Lifetime Orders</p></div>
-        <div class="stat-card bg-2"><h2 id="todayCount">0</h2><p>Today's Entries</p></div>
-        <div class="stat-card bg-3"><h2 id="topPlatform">N/A</h2><p>Recent Platform</p></div>
+        <div class="stat-card bg-2"><h2 id="todayCount">0</h2><p>Today's Total</p></div>
+        <div class="stat-card bg-3"><h2 id="activeState">N/A</h2><p>Last Order State</p></div>
     </div>
 
-    <div class="search-box">
-        <span style="margin-right:10px">🔍</span>
-        <input type="text" id="searchInput" placeholder="Filter by Name, Order ID, Phone or State..." onkeyup="filterData()">
-    </div>
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search across all 8 columns..." onkeyup="filterData()">
 
-    <div class="table-wrap">
-        <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="col-dt">Purchase Date</th>
-                        <th class="col-nm">Full Name</th>
-                        <th class="col-ph">Phone</th>
-                        <th class="col-em">Email</th>
-                        <th class="col-id">Order ID</th>
-                        <th class="col-pl">Platform</th>
-                        <th class="col-st">State</th>
-                        <th class="col-pn">Pin</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
+    <div class="main-content">
+        <div class="breakdown-box">
+            <h3>Platform Breakdown</h3>
+            <div id="breakdownList">
+                <p style="color: #999; font-size: 12px;">Loading statistics...</p>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-dt">Date</th>
+                            <th class="col-nm">Name</th>
+                            <th class="col-ph">Phone</th>
+                            <th class="col-em">Email</th>
+                            <th class="col-id">Order ID</th>
+                            <th class="col-pl">Platform</th>
+                            <th class="col-st">State</th>
+                            <th class="col-pn">Pin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // YOUR CSV LINK (Updated with GID)
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=0&single=true&output=csv';
-    
     let masterData = [];
 
     async function fetchData() {
-        const status = document.getElementById('syncStatus');
         try {
-            const response = await fetch(csvUrl + '&cache=' + Date.now());
+            const response = await fetch(csvUrl + '&cb=' + Date.now());
             const text = await response.text();
-            masterData = robustParser(text);
-            renderTable(masterData);
-            status.innerText = "LIVE: " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        } catch (err) { status.innerText = "OFFLINE"; }
+            masterData = parseCSV(text);
+            updateDashboard(masterData);
+            document.getElementById('syncStatus').innerText = "LIVE: " + new Date().toLocaleTimeString();
+        } catch (e) { document.getElementById('syncStatus').innerText = "OFFLINE"; }
     }
 
-    function robustParser(text) {
+    function parseCSV(text) {
         const rows = [];
-        let curRow = [], curVal = '', inQuotes = false;
-        
+        let cur = [], val = '', q = false;
         for (let i = 0; i < text.length; i++) {
-            const char = text[i], next = text[i+1];
-            if (char === '"') {
-                if (inQuotes && next === '"') { curVal += '"'; i++; }
-                else inQuotes = !inQuotes;
-            } 
-            else if (char === ',' && !inQuotes) { curRow.push(curVal); curVal = ''; }
-            else if ((char === '\r' || char === '\n') && !inQuotes) {
-                curRow.push(curVal);
-                if (curRow.length > 1) rows.push(curRow);
-                curRow = []; curVal = '';
-                if (char === '\r' && next === '\n') i++;
-            } 
-            else curVal += char;
+            let c = text[i], n = text[i+1];
+            if (c === '"') { if (q && n === '"') { val += '"'; i++; } else q = !q; }
+            else if (c === ',' && !q) { cur.push(val); val = ''; }
+            else if ((c === '\r' || c === '\n') && !q) {
+                cur.push(val); if (cur.length > 1) rows.push(cur);
+                cur = []; val = ''; if (c === '\r' && n === '\n') i++;
+            } else val += c;
         }
-        if (curVal || curRow.length > 0) { curRow.push(curVal); rows.push(curRow); }
-        
+        if (val || cur.length > 0) { cur.push(val); rows.push(cur); }
         return rows.slice(1).map(c => ({
-            date: (c[0]||"").trim(),
-            name: (c[1]||"").trim(),
-            phone: (c[2]||"").trim(),
-            email: (c[3]||"").trim(),
-            oid: (c[4]||"").trim(),
-            plat: (c[5]||"").trim(),
-            state: (c[6]||"").trim(),
-            pin: (c[7]||"").trim()
-        })).filter(r => r.name !== "");
+            dt: c[0]||'', nm: c[1]||'', ph: c[2]||'', em: c[3]||'',
+            id: c[4]||'', pl: (c[5]||'Other').trim(), st: c[6]||'', pn: c[7]||''
+        })).filter(r => r.nm !== "");
     }
 
-    function renderTable(data, isFiltering = false) {
+    function updateDashboard(data) {
+        // Table Update
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = data.map(r => `
             <tr>
-                <td class="col-dt" style="color:#666;">${r.date}</td>
-                <td class="col-nm"><strong>${r.name}</strong></td>
-                <td class="col-ph">${r.phone}</td>
-                <td class="col-em" title="${r.email}">${r.email}</td>
-                <td class="col-id" title="${r.oid}"><span class="order-id">${r.oid}</span></td>
-                <td class="col-pl"><span class="platform-badge">${r.plat}</span></td>
-                <td class="col-st"><strong>${r.state}</strong></td>
-                <td class="col-pn">${r.pin}</td>
+                <td class="col-dt">${r.dt}</td>
+                <td class="col-nm"><strong>${r.nm}</strong></td>
+                <td class="col-ph">${r.ph}</td>
+                <td class="col-em">${r.em}</td>
+                <td class="col-id" style="color:#2980b9; font-weight:bold;">${r.id}</td>
+                <td class="col-pl">${r.pl}</td>
+                <td class="col-st">${r.st}</td>
+                <td class="col-pn">${r.pn}</td>
             </tr>
         `).join('');
 
-        if (!isFiltering) {
-            document.getElementById('totalCount').innerText = data.length;
-            if(data.length > 0) document.getElementById('topPlatform').innerText = data[0].plat;
-            
-            // Basic "Today" logic based on last entry
-            const today = new Date().toLocaleDateString();
-            const todayCount = data.filter(d => d.date.includes(today)).length;
-            document.getElementById('todayCount').innerText = todayCount || data.length; 
-        }
+        // Stats Update
+        document.getElementById('totalCount').innerText = data.length;
+        if(data.length > 0) document.getElementById('activeState').innerText = data[0].st;
+
+        // Platform Breakdown Logic
+        const counts = {};
+        data.forEach(r => { counts[r.pl] = (counts[r.pl] || 0) + 1; });
+        
+        const breakdownHTML = Object.keys(counts).map(plat => `
+            <div class="breakdown-item">
+                <span>${plat}</span>
+                <span class="count-badge">${counts[plat]}</span>
+            </div>
+        `).join('');
+        document.getElementById('breakdownList').innerHTML = breakdownHTML;
     }
 
     function filterData() {
@@ -219,11 +168,11 @@
         const filtered = masterData.filter(row => 
             Object.values(row).some(val => val.toLowerCase().includes(query))
         );
-        renderTable(filtered, true);
+        updateDashboard(filtered);
     }
 
     window.onload = fetchData;
-    setInterval(fetchData, 30000); // Auto-refresh every 30 seconds
+    setInterval(fetchData, 60000); 
 </script>
 </body>
 </html>
