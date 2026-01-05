@@ -22,7 +22,7 @@
         .lifetime-card h2 { margin: 0; font-size: 42px; }
         .lifetime-card p { margin: 5px 0 0; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; opacity: 0.8; }
 
-        /* Platform Breakdown - Top Grid */
+        /* Platform Breakdown */
         .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; margin-top: 10px; }
         .plat-card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border-top: 4px solid var(--fedus-green); }
         .plat-card h4 { margin: 0; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -37,10 +37,11 @@
         td { padding: 14px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         tr:hover { background-color: #f9fbfc; }
 
-        /* 9 Column widths to match image_868cc4.png */
-        .col-dt { width: 150px; } .col-nm { width: 160px; } .col-ph { width: 115px; }
-        .col-em { width: 200px; } .col-id { width: 160px; } .col-sc { width: 100px; }
-        .col-pl { width: 110px; } .col-st { width: 120px; } .col-pn { width: 85px; }
+        /* Column widths - Updated for 10 columns */
+        .col-dt { width: 110px; } .col-nm { width: 150px; } .col-ph { width: 115px; }
+        .col-em { width: 190px; } .col-id { width: 160px; } .col-sc { width: 100px; }
+        .col-pl { width: 100px; } .col-st { width: 110px; } .col-pn { width: 80px; }
+        .col-pr { width: 150px; } /* Added Product Column width */
     </style>
 </head>
 <body>
@@ -61,18 +62,17 @@
             <h2 id="totalCount">0</h2>
             <p>Total Lifetime Orders</p>
         </div>
-        <div id="platformBreakdown" class="platform-grid">
-            </div>
+        <div id="platformBreakdown" class="platform-grid"></div>
     </div>
 
-    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search Name, Order ID, Platform, or State..." onkeyup="filterData()">
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search Name, Order ID, Product, or State..." onkeyup="filterData()">
 
     <div class="table-wrap">
         <div class="table-scroll">
             <table>
                 <thead>
                     <tr>
-                        <th class="col-dt">Purchase Date</th>
+                        <th class="col-dt">Date</th>
                         <th class="col-nm">Full Name</th>
                         <th class="col-ph">Phone</th>
                         <th class="col-em">Email</th>
@@ -81,7 +81,7 @@
                         <th class="col-pl">Platform</th>
                         <th class="col-st">State</th>
                         <th class="col-pn">Pin</th>
-                    </tr>
+                        <th class="col-pr">Product</th> </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
@@ -117,7 +117,7 @@
         }
         if (val || cur.length > 0) { cur.push(val); rows.push(cur); }
         
-        // Mapping exactly to your 9-column Google Sheet structure
+        // Updated to map 10 columns (0 to 9)
         return rows.slice(1).map(c => ({
             dt: (c[0]||'').trim(), 
             nm: (c[1]||'').trim(), 
@@ -127,12 +127,12 @@
             sc: (c[5]||'').trim(), 
             pl: (c[6]||'Other').trim(), 
             st: (c[7]||'').trim(), 
-            pn: (c[8]||'').trim()
+            pn: (c[8]||'').trim(),
+            pr: (c[9]||'').trim() // New Product Column Mapping
         })).filter(r => r.nm !== "");
     }
 
     function updateDashboard(data) {
-        // Table Rendering
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = data.map(r => `
             <tr>
@@ -145,13 +145,11 @@
                 <td class="col-pl">${r.pl}</td>
                 <td class="col-st">${r.st}</td>
                 <td class="col-pn">${r.pn}</td>
-            </tr>
+                <td class="col-pr">${r.pr}</td> </tr>
         `).join('');
 
-        // Lifetime Counter
         document.getElementById('totalCount').innerText = data.length;
 
-        // Platform Breakdown Logic
         const platformCounts = {};
         data.forEach(r => { 
             const p = r.pl;
