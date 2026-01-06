@@ -34,14 +34,14 @@
         .table-scroll { overflow-x: auto; max-height: 550px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
         th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; padding: 15px 12px; text-align: left; color: #555; font-weight: 600; border-bottom: 2px solid #eee; }
-        td { padding: 14px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        td { padding: 14px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
         tr:hover { background-color: #f9fbfc; }
 
-        /* Column widths - Updated for 10 columns */
+        /* Column widths */
         .col-dt { width: 110px; } .col-nm { width: 150px; } .col-ph { width: 115px; }
         .col-em { width: 190px; } .col-id { width: 160px; } .col-sc { width: 100px; }
         .col-pl { width: 100px; } .col-st { width: 110px; } .col-pn { width: 80px; }
-        .col-pr { width: 150px; } /* Added Product Column width */
+        .col-pr { width: 150px; }
     </style>
 </head>
 <body>
@@ -81,7 +81,8 @@
                         <th class="col-pl">Platform</th>
                         <th class="col-st">State</th>
                         <th class="col-pn">Pin</th>
-                        <th class="col-pr">Product</th> </tr>
+                        <th class="col-pr">Product</th> 
+                    </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
@@ -117,7 +118,6 @@
         }
         if (val || cur.length > 0) { cur.push(val); rows.push(cur); }
         
-        // Updated to map 10 columns (0 to 9)
         return rows.slice(1).map(c => ({
             dt: (c[0]||'').trim(), 
             nm: (c[1]||'').trim(), 
@@ -128,7 +128,7 @@
             pl: (c[6]||'Other').trim(), 
             st: (c[7]||'').trim(), 
             pn: (c[8]||'').trim(),
-            pr: (c[9]||'').trim() // New Product Column Mapping
+            pr: (c[9]||'').trim() 
         })).filter(r => r.nm !== "");
     }
 
@@ -136,16 +136,17 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = data.map(r => `
             <tr>
-                <td class="col-dt">${r.dt}</td>
-                <td class="col-nm"><strong>${r.nm}</strong></td>
-                <td class="col-ph">${r.ph}</td>
-                <td class="col-em">${r.em}</td>
-                <td class="col-id" style="color:#2980b9; font-weight:bold;">${r.id}</td>
-                <td class="col-sc">${r.sc}</td>
-                <td class="col-pl">${r.pl}</td>
-                <td class="col-st">${r.st}</td>
-                <td class="col-pn">${r.pn}</td>
-                <td class="col-pr">${r.pr}</td> </tr>
+                <td class="col-dt" title="${r.dt}">${r.dt}</td>
+                <td class="col-nm" title="${r.nm}"><strong>${r.nm}</strong></td>
+                <td class="col-ph" title="${r.ph}">${r.ph}</td>
+                <td class="col-em" title="${r.em}">${r.em}</td>
+                <td class="col-id" title="${r.id}" style="color:#2980b9; font-weight:bold;">${r.id}</td>
+                <td class="col-sc" title="${r.sc}">${r.sc}</td>
+                <td class="col-pl" title="${r.pl}">${r.pl}</td>
+                <td class="col-st" title="${r.st}">${r.st}</td>
+                <td class="col-pn" title="${r.pn}">${r.pn}</td>
+                <td class="col-pr" title="${r.pr}">${r.pr}</td> 
+            </tr>
         `).join('');
 
         document.getElementById('totalCount').innerText = data.length;
