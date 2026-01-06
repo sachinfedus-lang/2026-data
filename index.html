@@ -5,88 +5,57 @@
     <title>FEDUS | 2026 Operations Dashboard</title>
     <style>
         :root { --fedus-blue: #0a111f; --fedus-green: #27ae60; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 100%; margin: auto; }
-
-        /* Header Area */
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 15px 30px; border-radius: 12px; color: white; }
-        .logo-area img { height: 40px; }
-        .header-actions { display: flex; gap: 15px; align-items: center; }
-        .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.3s; }
-        .refresh-btn:hover { background: #1e8449; transform: translateY(-1px); }
+        .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .sync-pill { background: rgba(39, 174, 96, 0.1); color: #2ecc71; padding: 6px 14px; border-radius: 20px; font-size: 11px; border: 1px solid var(--fedus-green); font-weight: 600; }
-
-        /* KPI Section */
-        .kpi-row { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; gap: 20px; }
-        .lifetime-card { background: linear-gradient(135deg, #1c2d41 0%, #0a111f 100%); padding: 25px; border-radius: 12px; color: white; text-align: center; min-width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .lifetime-card h2 { margin: 0; font-size: 42px; }
-        .lifetime-card p { margin: 5px 0 0; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; opacity: 0.8; }
-
-        /* Platform Breakdown */
-        .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; margin-top: 10px; }
-        .plat-card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #ddd; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border-top: 4px solid var(--fedus-green); }
-        .plat-card h4 { margin: 0; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .plat-card div { font-size: 26px; font-weight: bold; color: var(--fedus-blue); margin-top: 8px; }
-
-        /* Search & Table */
-        .search-box { background: white; padding: 14px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ddd; width: 100%; box-sizing: border-box; font-size: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
-        .table-wrap { background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .table-scroll { overflow-x: auto; max-height: 550px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; padding: 15px 12px; text-align: left; color: #555; font-weight: 600; border-bottom: 2px solid #eee; }
-        td { padding: 14px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
-        tr:hover { background-color: #f9fbfc; }
-
-        /* Column widths */
-        .col-dt { width: 110px; } .col-nm { width: 150px; } .col-ph { width: 115px; }
-        .col-em { width: 190px; } .col-id { width: 160px; } .col-sc { width: 100px; }
-        .col-pl { width: 100px; } .col-st { width: 110px; } .col-pn { width: 80px; }
-        .col-pr { width: 150px; }
+        .kpi-row { text-align: center; margin-bottom: 25px; }
+        .lifetime-card { background: linear-gradient(135deg, #1c2d41 0%, #0a111f 100%); padding: 20px; border-radius: 12px; color: white; display: inline-block; min-width: 250px; }
+        .search-box { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
+        .table-wrap { background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; }
+        .table-scroll { overflow-x: auto; max-height: 600px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; padding: 12px; text-align: left; border-bottom: 2px solid #eee; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
+        /* Column Widths for 12 columns */
+        .col-dt { width: 90px; } .col-nm { width: 140px; } .col-ph { width: 100px; }
+        .col-ap { width: 100px; } .col-em { width: 160px; } .col-pl { width: 90px; }
+        .col-id { width: 140px; } .col-sc { width: 90px; } .col-st { width: 100px; }
+        .col-pn { width: 70px; } .col-pr { width: 150px; } .col-pc { width: 100px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="logo-area">
-            <img src="logo.png" alt="FEDUS" onerror="this.src='https://via.placeholder.com/120x40?text=FEDUS'">
-        </div>
-        <div class="header-actions">
-            <span id="syncStatus" class="sync-pill">CONNECTING...</span>
-            <button class="refresh-btn" onclick="fetchData()">🔄 REFRESH DATA</button>
-        </div>
+<div class="header">
+    <div class="logo-area"><h2 style="margin:0">FEDUS</h2></div>
+    <div class="header-actions">
+        <span id="syncStatus" class="sync-pill">CONNECTING...</span>
+        <button class="refresh-btn" onclick="fetchData()">🔄 REFRESH</button>
     </div>
+</div>
 
-    <div class="kpi-row">
-        <div class="lifetime-card">
-            <h2 id="totalCount">0</h2>
-            <p>Total Lifetime Orders</p>
-        </div>
-        <div id="platformBreakdown" class="platform-grid"></div>
+<div class="kpi-row">
+    <div class="lifetime-card">
+        <h2 id="totalCount" style="margin:0; font-size:36px;">0</h2>
+        <p style="margin:0; text-transform:uppercase; font-size:11px;">Total Orders</p>
     </div>
+</div>
 
-    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search Name, Order ID, Product, or State..." onkeyup="filterData()">
+<input type="text" id="searchInput" class="search-box" placeholder="🔍 Search any field..." onkeyup="filterData()">
 
-    <div class="table-wrap">
-        <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="col-dt">Date</th>
-                        <th class="col-nm">Full Name</th>
-                        <th class="col-ph">Phone</th>
-                        <th class="col-em">Email</th>
-                        <th class="col-id">Order ID</th>
-                        <th class="col-sc">Source</th>
-                        <th class="col-pl">Platform</th>
-                        <th class="col-st">State</th>
-                        <th class="col-pn">Pin</th>
-                        <th class="col-pr">Product</th> 
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
+<div class="table-wrap">
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-dt">Date</th><th class="col-nm">Name</th><th class="col-ph">Phone</th>
+                    <th class="col-ap">Alt Phone</th><th class="col-em">Email</th><th class="col-pl">Platform</th>
+                    <th class="col-id">Order ID</th><th class="col-sc">Source</th><th class="col-st">State</th>
+                    <th class="col-pn">Pin</th><th class="col-pr">Product</th><th class="col-pc">Code</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
     </div>
 </div>
 
@@ -100,7 +69,7 @@
             const text = await response.text();
             masterData = parseCSV(text);
             updateDashboard(masterData);
-            document.getElementById('syncStatus').innerText = "LIVE: " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('syncStatus').innerText = "LIVE: " + new Date().toLocaleTimeString();
         } catch (e) { document.getElementById('syncStatus').innerText = "OFFLINE"; }
     }
 
@@ -119,16 +88,10 @@
         if (val || cur.length > 0) { cur.push(val); rows.push(cur); }
         
         return rows.slice(1).map(c => ({
-            dt: (c[0]||'').trim(), 
-            nm: (c[1]||'').trim(), 
-            ph: (c[2]||'').trim(), 
-            em: (c[3]||'').trim(),
-            id: (c[4]||'').trim(), 
-            sc: (c[5]||'').trim(), 
-            pl: (c[6]||'Other').trim(), 
-            st: (c[7]||'').trim(), 
-            pn: (c[8]||'').trim(),
-            pr: (c[9]||'').trim() 
+            dt: (c[0]||'').trim(), nm: (c[1]||'').trim(), ph: (c[2]||'').trim(),
+            ap: (c[3]||'').trim(), em: (c[4]||'').trim(), pl: (c[5]||'').trim(),
+            id: (c[6]||'').trim(), sc: (c[7]||'').trim(), st: (c[8]||'').trim(),
+            pn: (c[9]||'').trim(), pr: (c[10]||'').trim(), pc: (c[11]||'').trim()
         })).filter(r => r.nm !== "");
     }
 
@@ -139,31 +102,18 @@
                 <td class="col-dt" title="${r.dt}">${r.dt}</td>
                 <td class="col-nm" title="${r.nm}"><strong>${r.nm}</strong></td>
                 <td class="col-ph" title="${r.ph}">${r.ph}</td>
+                <td class="col-ap" title="${r.ap}">${r.ap}</td>
                 <td class="col-em" title="${r.em}">${r.em}</td>
+                <td class="col-pl" title="${r.pl}">${r.pl}</td>
                 <td class="col-id" title="${r.id}" style="color:#2980b9; font-weight:bold;">${r.id}</td>
                 <td class="col-sc" title="${r.sc}">${r.sc}</td>
-                <td class="col-pl" title="${r.pl}">${r.pl}</td>
                 <td class="col-st" title="${r.st}">${r.st}</td>
                 <td class="col-pn" title="${r.pn}">${r.pn}</td>
-                <td class="col-pr" title="${r.pr}">${r.pr}</td> 
+                <td class="col-pr" title="${r.pr}">${r.pr}</td>
+                <td class="col-pc" title="${r.pc}">${r.pc}</td>
             </tr>
         `).join('');
-
         document.getElementById('totalCount').innerText = data.length;
-
-        const platformCounts = {};
-        data.forEach(r => { 
-            const p = r.pl;
-            platformCounts[p] = (platformCounts[p] || 0) + 1; 
-        });
-        
-        const breakdownHTML = Object.keys(platformCounts).map(plat => `
-            <div class="plat-card">
-                <h4>${plat}</h4>
-                <div>${platformCounts[plat]}</div>
-            </div>
-        `).join('');
-        document.getElementById('platformBreakdown').innerHTML = breakdownHTML;
     }
 
     function filterData() {
