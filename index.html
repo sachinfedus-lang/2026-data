@@ -6,17 +6,37 @@
     <style>
         :root { --fedus-blue: #0a111f; --fedus-green: #27ae60; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 15px 30px; border-radius: 12px; color: white; }
         .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .sync-pill { background: rgba(39, 174, 96, 0.1); color: #2ecc71; padding: 6px 14px; border-radius: 20px; font-size: 11px; border: 1px solid var(--fedus-green); font-weight: 600; }
+        
         .kpi-row { text-align: center; margin-bottom: 25px; }
         .lifetime-card { background: linear-gradient(135deg, #1c2d41 0%, #0a111f 100%); padding: 20px; border-radius: 12px; color: white; display: inline-block; min-width: 250px; }
+        
         .search-box { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
+        
+        /* STICKY HEADER CONTAINER */
         .table-wrap { background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; }
-        .table-scroll { overflow-x: auto; max-height: 600px; }
+        .table-scroll { overflow-y: auto; overflow-x: auto; max-height: 600px; position: relative; }
+        
         table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
-        th { background: #f8f9fa; position: sticky; top: 0; z-index: 10; padding: 12px; text-align: left; border-bottom: 2px solid #eee; }
+        
+        /* STICKY HEADER CSS */
+        th { 
+            background: #f8f9fa; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 2px solid #eee;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.1); /* Separator line for sticky effect */
+        }
+        
         td { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
+        tr:hover { background-color: #f9fbfc; }
+
         /* Column Widths for 12 columns */
         .col-dt { width: 90px; } .col-nm { width: 140px; } .col-ph { width: 100px; }
         .col-ap { width: 100px; } .col-em { width: 160px; } .col-pl { width: 90px; }
@@ -27,7 +47,7 @@
 <body>
 
 <div class="header">
-    <div class="logo-area"><h2 style="margin:0">FEDUS</h2></div>
+    <div class="logo-area"><h2 style="margin:0">FEDUS Dashboard</h2></div>
     <div class="header-actions">
         <span id="syncStatus" class="sync-pill">CONNECTING...</span>
         <button class="refresh-btn" onclick="fetchData()">🔄 REFRESH</button>
