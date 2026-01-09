@@ -31,17 +31,21 @@
             padding: 12px; 
             text-align: left; 
             border-bottom: 2px solid #eee;
-            box-shadow: 0 1px 0 rgba(0,0,0,0.1); /* Separator line for sticky effect */
+            box-shadow: 0 1px 0 rgba(0,0,0,0.1); 
         }
         
         td { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
         tr:hover { background-color: #f9fbfc; }
 
-        /* Column Widths for 12 columns */
+        /* Column Widths for 13 columns */
         .col-dt { width: 90px; } .col-nm { width: 140px; } .col-ph { width: 100px; }
         .col-ap { width: 100px; } .col-em { width: 160px; } .col-pl { width: 90px; }
         .col-id { width: 140px; } .col-sc { width: 90px; } .col-st { width: 100px; }
         .col-pn { width: 70px; } .col-pr { width: 150px; } .col-pc { width: 100px; }
+        .col-pf { width: 100px; } /* New Proof Column Width */
+
+        .invoice-link { color: #3498db; text-decoration: none; font-weight: bold; }
+        .invoice-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -72,6 +76,7 @@
                     <th class="col-ap">Alt Phone</th><th class="col-em">Email</th><th class="col-pl">Platform</th>
                     <th class="col-id">Order ID</th><th class="col-sc">Source</th><th class="col-st">State</th>
                     <th class="col-pn">Pin</th><th class="col-pr">Product</th><th class="col-pc">Code</th>
+                    <th class="col-pf">Invoice</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -111,13 +116,16 @@
             dt: (c[0]||'').trim(), nm: (c[1]||'').trim(), ph: (c[2]||'').trim(),
             ap: (c[3]||'').trim(), em: (c[4]||'').trim(), pl: (c[5]||'').trim(),
             id: (c[6]||'').trim(), sc: (c[7]||'').trim(), st: (c[8]||'').trim(),
-            pn: (c[9]||'').trim(), pr: (c[10]||'').trim(), pc: (c[11]||'').trim()
+            pn: (c[9]||'').trim(), pr: (c[10]||'').trim(), pc: (c[11]||'').trim(),
+            pf: (c[12]||'').trim() // Mapping the 13th Column (M)
         })).filter(r => r.nm !== "");
     }
 
     function updateDashboard(data) {
         const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = data.map(r => `
+        tbody.innerHTML = data.map(r => {
+            const invoiceLink = r.pf.startsWith('http') ? `<a href="${r.pf}" target="_blank" class="invoice-link">View File</a>` : 'No File';
+            return `
             <tr>
                 <td class="col-dt" title="${r.dt}">${r.dt}</td>
                 <td class="col-nm" title="${r.nm}"><strong>${r.nm}</strong></td>
@@ -131,8 +139,9 @@
                 <td class="col-pn" title="${r.pn}">${r.pn}</td>
                 <td class="col-pr" title="${r.pr}">${r.pr}</td>
                 <td class="col-pc" title="${r.pc}">${r.pc}</td>
+                <td class="col-pf" title="${r.pf}">${invoiceHtml = invoiceLink}</td>
             </tr>
-        `).join('');
+        `}).join('');
         document.getElementById('totalCount').innerText = data.length;
     }
 
