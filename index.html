@@ -7,7 +7,11 @@
         :root { --fedus-blue: #0a111f; --fedus-green: #27ae60; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 15px 30px; border-radius: 12px; color: white; }
+        /* HEADER STYLING */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 10px 30px; border-radius: 12px; color: white; }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-img { height: 40px; width: auto; } /* Adjust height as needed */
+        
         .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .sync-pill { background: rgba(39, 174, 96, 0.1); color: #2ecc71; padding: 6px 14px; border-radius: 20px; font-size: 11px; border: 1px solid var(--fedus-green); font-weight: 600; }
         
@@ -16,13 +20,11 @@
         
         .search-box { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
         
-        /* STICKY HEADER CONTAINER */
         .table-wrap { background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; }
         .table-scroll { overflow-y: auto; overflow-x: auto; max-height: 600px; position: relative; }
         
         table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
         
-        /* STICKY HEADER CSS */
         th { 
             background: #f8f9fa; 
             position: sticky; 
@@ -42,7 +44,7 @@
         .col-ap { width: 100px; } .col-em { width: 160px; } .col-pl { width: 90px; }
         .col-id { width: 140px; } .col-sc { width: 90px; } .col-st { width: 100px; }
         .col-pn { width: 70px; } .col-pr { width: 150px; } .col-pc { width: 100px; }
-        .col-pf { width: 100px; } /* New Proof Column Width */
+        .col-pf { width: 100px; }
 
         .invoice-link { color: #3498db; text-decoration: none; font-weight: bold; }
         .invoice-link:hover { text-decoration: underline; }
@@ -51,7 +53,10 @@
 <body>
 
 <div class="header">
-    <div class="logo-area"><h2 style="margin:0">FEDUS Dashboard</h2></div>
+    <div class="logo-area">
+        <img src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/logo.png" alt="FEDUS Logo" class="logo-img">
+        <h2 style="margin:0">FEDUS Dashboard</h2>
+    </div>
     <div class="header-actions">
         <span id="syncStatus" class="sync-pill">CONNECTING...</span>
         <button class="refresh-btn" onclick="fetchData()">🔄 REFRESH</button>
@@ -85,6 +90,7 @@
 </div>
 
 <script>
+    // IMPORTANT: Use your specific Published CSV Link here
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=0&single=true&output=csv';
     let masterData = [];
 
@@ -117,7 +123,7 @@
             ap: (c[3]||'').trim(), em: (c[4]||'').trim(), pl: (c[5]||'').trim(),
             id: (c[6]||'').trim(), sc: (c[7]||'').trim(), st: (c[8]||'').trim(),
             pn: (c[9]||'').trim(), pr: (c[10]||'').trim(), pc: (c[11]||'').trim(),
-            pf: (c[12]||'').trim() // Mapping the 13th Column (M)
+            pf: (c[12]||'').trim() 
         })).filter(r => r.nm !== "");
     }
 
@@ -139,7 +145,7 @@
                 <td class="col-pn" title="${r.pn}">${r.pn}</td>
                 <td class="col-pr" title="${r.pr}">${r.pr}</td>
                 <td class="col-pc" title="${r.pc}">${r.pc}</td>
-                <td class="col-pf" title="${r.pf}">${invoiceHtml = invoiceLink}</td>
+                <td class="col-pf" title="${r.pf}">${invoiceLink}</td>
             </tr>
         `}).join('');
         document.getElementById('totalCount').innerText = data.length;
