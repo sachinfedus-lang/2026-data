@@ -7,9 +7,8 @@
         :root { --fedus-blue: #0a111f; --fedus-green: #27ae60; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
         
-        /* HEADER STYLING */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 10px 30px; border-radius: 12px; color: white; }
-        .logo-area { display: flex; align-items: center; gap: 12px; } /* Gap between logo and text */
+        .logo-area { display: flex; align-items: center; gap: 12px; }
         .logo-img { height: 45px; width: auto; border-radius: 4px; }
         
         .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -25,17 +24,7 @@
         
         table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
         
-        th { 
-            background: #f8f9fa; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            padding: 12px; 
-            text-align: left; 
-            border-bottom: 2px solid #eee;
-            box-shadow: 0 1px 0 rgba(0,0,0,0.1);
-        }
-        
+        th { background: #f8f9fa; position: sticky; top: 0; z-index: 100; padding: 12px; text-align: left; border-bottom: 2px solid #eee; box-shadow: 0 1px 0 rgba(0,0,0,0.1); }
         td { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
         tr:hover { background-color: #f9fbfc; }
 
@@ -89,7 +78,8 @@
 </div>
 
 <script>
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=0&single=true&output=csv';
+    // Updated with your NEW published CSV link
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=1747140024&single=true&output=csv';
     let masterData = [];
 
     async function fetchData() {
@@ -117,11 +107,19 @@
         if (val || cur.length > 0) { cur.push(val); rows.push(cur); }
         
         return rows.slice(1).map(c => ({
-            dt: (c[0]||'').trim(), nm: (c[1]||'').trim(), ph: (c[2]||'').trim(),
-            ap: (c[3]||'').trim(), em: (c[4]||'').trim(), pl: (c[5]||'').trim(),
-            id: (c[6]||'').trim(), sc: (c[7]||'').trim(), st: (c[8]||'').trim(),
-            pn: (c[9]||'').trim(), pr: (c[10]||'').trim(), pc: (c[11]||'').trim(),
-            pf: (c[12]||'').trim() 
+            dt: (c[1]||'').trim(), // B
+            nm: (c[2]||'').trim(), // C
+            ph: (c[3]||'').trim(), // D
+            ap: (c[4]||'').trim(), // E
+            em: (c[5]||'').trim(), // F
+            pl: (c[6]||'').trim(), // G
+            id: (c[7]||'').trim(), // H
+            pf: (c[8]||'').trim(), // I (Invoice)
+            sc: (c[9]||'').trim(), // J (Source)
+            st: (c[10]||'').trim(), // K (State)
+            pn: (c[11]||'').trim(), // L (Pin)
+            pr: (c[12]||'').trim(), // M (Product)
+            pc: (c[13]||'').trim()  // N (Code)
         })).filter(r => r.nm !== "");
     }
 
