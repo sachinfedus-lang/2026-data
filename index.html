@@ -7,9 +7,9 @@
         :root { --fedus-blue: #0a111f; --fedus-green: #27ae60; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
         
-        /* HEADER STYLING WITH LOGO */
+        /* HEADER STYLING */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 10px 30px; border-radius: 12px; color: white; }
-        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-area { display: flex; align-items: center; gap: 12px; } /* Gap between logo and text */
         .logo-img { height: 45px; width: auto; border-radius: 4px; }
         
         .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -39,7 +39,6 @@
         td { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help; }
         tr:hover { background-color: #f9fbfc; }
 
-        /* Column Widths for 13 columns */
         .col-dt { width: 90px; } .col-nm { width: 140px; } .col-ph { width: 100px; }
         .col-ap { width: 100px; } .col-em { width: 160px; } .col-pl { width: 90px; }
         .col-id { width: 140px; } .col-sc { width: 90px; } .col-st { width: 100px; }
@@ -54,8 +53,8 @@
 
 <div class="header">
     <div class="logo-area">
-        <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="FEDUS Logo" class="logo-img">
-        <h2 style="margin:0">FEDUS Dashboard</h2>
+        <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="Logo" class="logo-img">
+        <h2 style="margin:0; font-weight: 500; letter-spacing: 1px;">Dashboard</h2>
     </div>
     <div class="header-actions">
         <span id="syncStatus" class="sync-pill">CONNECTING...</span>
