@@ -15,7 +15,9 @@
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 10px 30px; border-radius: 12px; color: var(--header-text); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 45px; width: auto; border-radius: 4px; filter: brightness(0) invert(1); }
+        
+        /* Updated Logo Styling */
+        .logo-img { height: 50px; width: auto; border-radius: 4px; }
         
         .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .sync-pill { background: rgba(255, 255, 255, 0.2); color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; border: 1px solid white; font-weight: 600; }
@@ -55,7 +57,7 @@
 
 <div class="header">
     <div class="logo-area">
-        <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="Logo" class="logo-img">
+        <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="FEDUS Logo" class="logo-img">
         <h2 style="margin:0; font-weight: 600; letter-spacing: 0.5px;">Operations Dashboard</h2>
     </div>
     <div class="header-actions">
@@ -139,7 +141,6 @@
         })).filter(r => r.nm !== "");
     }
 
-    // Standardizes DD/MM/YYYY for chronological sorting
     function stringToDate(dateStr) {
         const parts = dateStr.split('/');
         if(parts.length < 3) return new Date(0);
@@ -148,7 +149,7 @@
     }
 
     function updateDashboard(data) {
-        // --- CALENDAR SORTING: OLDEST TO NEWEST ---
+        // --- OLDEST FIRST SORTING ---
         const sortedData = [...data].sort((a, b) => {
             return stringToDate(a.dt) - stringToDate(b.dt);
         });
