@@ -5,34 +5,29 @@
     <title>FEDUS | 2026 Operations Dashboard</title>
     <style>
         :root { 
-            --fedus-blue: #3498db; /* Light Blue */
-            --fedus-orange: #f39c12; /* Orange */
+            --fedus-blue: #3498db; 
+            --fedus-orange: #f39c12; 
             --fedus-green: #27ae60; 
             --bg: #f4f7f6; 
             --header-text: #ffffff;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
         
-        /* 1. Light Blue Header */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 10px 30px; border-radius: 12px; color: var(--header-text); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-img { height: 45px; width: auto; border-radius: 4px; filter: brightness(0) invert(1); } /* Makes black logo white for blue bg */
+        .logo-img { height: 45px; width: auto; border-radius: 4px; filter: brightness(0) invert(1); }
         
         .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .sync-pill { background: rgba(255, 255, 255, 0.2); color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; border: 1px solid white; font-weight: 600; }
         
-        /* 2. Top Highlights Row */
         .highlights-container { display: grid; grid-template-columns: 1fr 2fr 1.5fr; gap: 20px; margin-bottom: 25px; }
         
-        /* Orange Total Entries Card */
         .kpi-card { background: var(--fedus-orange); padding: 20px; border-radius: 12px; color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3); }
         
-        /* Analytics Cards */
         .analytics-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .analytics-card h3 { margin-top: 0; font-size: 14px; color: var(--fedus-blue); text-transform: uppercase; border-bottom: 2px solid #f4f7f6; padding-bottom: 8px; margin-bottom: 10px; }
         
         .stat-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; border-bottom: 1px solid #eee; }
-        .stat-item:last-child { border-bottom: none; }
         .bar-bg { background: #eee; height: 8px; border-radius: 4px; margin-top: 4px; overflow: hidden; }
         .bar-fill { background: var(--fedus-blue); height: 100%; border-radius: 4px; }
         .bar-fill.orange { background: var(--fedus-orange); }
@@ -118,7 +113,6 @@
             document.getElementById('syncStatus').innerText = "LIVE: " + new Date().toLocaleTimeString();
         } catch (e) { 
             document.getElementById('syncStatus').innerText = "OFFLINE"; 
-            console.error(e);
         }
     }
 
@@ -145,9 +139,22 @@
         })).filter(r => r.nm !== "");
     }
 
+    // Standardizes DD/MM/YYYY for chronological sorting
+    function stringToDate(dateStr) {
+        const parts = dateStr.split('/');
+        if(parts.length < 3) return new Date(0);
+        const [day, month, year] = parts;
+        return new Date(year, month - 1, day);
+    }
+
     function updateDashboard(data) {
+        // --- CALENDAR SORTING: OLDEST TO NEWEST ---
+        const sortedData = [...data].sort((a, b) => {
+            return stringToDate(a.dt) - stringToDate(b.dt);
+        });
+
         const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = data.map(r => {
+        tbody.innerHTML = sortedData.map(r => {
             const invoiceLink = r.pf.startsWith('http') ? `<a href="${r.pf}" target="_blank" class="invoice-link">View File</a>` : 'No File';
             return `
             <tr>
@@ -167,12 +174,11 @@
             </tr>`;
         }).join('');
         
-        document.getElementById('totalCount').innerText = data.length;
-        renderAnalytics(data);
+        document.getElementById('totalCount').innerText = sortedData.length;
+        renderAnalytics(sortedData);
     }
 
     function renderAnalytics(data) {
-        // Platform Analytics
         const platforms = {};
         data.forEach(r => { if(r.pl) platforms[r.pl] = (platforms[r.pl] || 0) + 1; });
         const platSorted = Object.entries(platforms).sort((a,b) => b[1] - a[1]);
@@ -181,15 +187,11 @@
         platContainer.innerHTML = platSorted.map(([name, count]) => {
             const pct = (count / data.length) * 100;
             return `
-                <div class="stat-item">
-                    <span>${name}</span>
-                    <strong>${count}</strong>
-                </div>
+                <div class="stat-item"><span>${name}</span><strong>${count}</strong></div>
                 <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
             `;
         }).join('');
 
-        // Region Analytics
         const regions = {};
         data.forEach(r => { if(r.st) regions[r.st] = (regions[r.st] || 0) + 1; });
         const regSorted = Object.entries(regions).sort((a,b) => b[1] - a[1]).slice(0, 5);
@@ -198,10 +200,7 @@
         regContainer.innerHTML = regSorted.map(([name, count]) => {
             const pct = (count / data.length) * 100;
             return `
-                <div class="stat-item">
-                    <span>${name}</span>
-                    <strong>${count} Orders</strong>
-                </div>
+                <div class="stat-item"><span>${name}</span><strong>${count} Orders</strong></div>
                 <div class="bar-bg"><div class="bar-fill orange" style="width:${pct}%"></div></div>
             `;
         }).join('');
