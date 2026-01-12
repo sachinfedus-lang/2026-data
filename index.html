@@ -58,7 +58,7 @@
             align-items: flex-end;
         }
 
-        .input-group { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 220px; }
+        .input-group { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 200px; }
         .input-group label { 
             font-weight: bold; 
             font-size: 13px; 
@@ -114,12 +114,10 @@
         .top-regions { display: flex; gap: 15px; flex-wrap: wrap; }
         .region-item { 
             background: #f8f9fa; padding: 15px 20px; border-radius: 12px; 
-            border-left: 5px solid var(--fedus-orange); min-width: 130px;
-            transition: transform 0.3s;
+            border-left: 5px solid var(--fedus-orange); min-width: 120px;
         }
-        .region-item:hover { transform: scale(1.05); }
-        .region-item .val { font-size: 26px; font-weight: bold; color: var(--text-dark); display: block; }
-        .region-item .lbl { font-size: 11px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; }
+        .region-item .val { font-size: 24px; font-weight: bold; color: var(--text-dark); display: block; }
+        .region-item .lbl { font-size: 10px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; }
 
         /* --- Table Styling --- */
         .table-wrap { 
@@ -131,31 +129,30 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12.8px; }
 
         th { 
-            background: #ffffff; position: sticky; top: 0; padding: 20px 12px; 
+            background: #ffffff; position: sticky; top: 0; padding: 20px 10px; 
             text-align: left; border-bottom: 4px solid var(--fedus-orange); z-index: 10;
-            color: var(--accent-blue); text-transform: uppercase; font-size: 11px;
+            color: var(--accent-blue); text-transform: uppercase; font-size: 10.5px;
             letter-spacing: 0.5px;
         }
 
         td { 
-            padding: 16px 12px; border-bottom: 1px solid #f0f0f0;
+            padding: 16px 10px; border-bottom: 1px solid #f0f0f0;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            color: #444;
         }
 
-        /* Specialized Column Widths for 10 Columns */
-        .col-date { width: 100px; }
-        .col-prod { width: 250px; }
-        .col-name { width: 150px; }
-        .col-email { width: 190px; }
-        .col-mobile { width: 115px; }
-        .col-order { width: 160px; }
-        .col-source { width: 120px; } /* Source Column M */
-        .col-plat { width: 100px; }
-        .col-state { width: 125px; }
-        .col-pin { width: 85px; }
+        /* --- COLUMN WIDTHS (Product Narrowed) --- */
+        .w-date { width: 95px; }
+        .w-prod { width: 160px; } /* SMALLER WIDTH AS REQUESTED */
+        .w-name { width: 140px; }
+        .w-email { width: 180px; }
+        .w-mobile { width: 110px; }
+        .w-order { width: 150px; }
+        .w-source { width: 110px; }
+        .w-plat { width: 95px; }
+        .w-state { width: 115px; }
+        .w-pin { width: 75px; }
 
-        /* Advanced Hover/Focus Tooltip */
+        /* Hover Tooltip Effect */
         td:hover { 
             overflow: visible; white-space: normal; position: relative; 
             background: #ffffff !important; z-index: 100; 
@@ -178,7 +175,6 @@
             animation: spin 1s linear infinite; margin-bottom: 15px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-text { font-weight: bold; color: var(--accent-blue); letter-spacing: 1px; }
 
     </style>
 </head>
@@ -186,7 +182,7 @@
 
 <div id="loadingOverlay">
     <div class="spinner"></div>
-    <div class="loading-text">SYNCING LATEST DATA...</div>
+    <div style="font-weight:bold; color:var(--accent-blue);">SYNCHRONIZING...</div>
 </div>
 
 <div class="header">
@@ -198,16 +194,16 @@
     
     <div class="toolbar">
         <div class="input-group">
-            <label><i class="fa fa-search"></i> Global Search</label>
-            <input type="text" id="searchInput" placeholder="Search by name, ID, or product..." onkeyup="processData()">
+            <label><i class="fa fa-search"></i> Search Database</label>
+            <input type="text" id="searchInput" placeholder="Search customer, order ID, product..." onkeyup="processData()">
         </div>
         <div class="input-group">
-            <label><i class="fa fa-calendar-alt"></i> Filter Date Range</label>
-            <input type="text" id="datePicker" placeholder="Start Date to End Date">
+            <label><i class="fa fa-calendar-alt"></i> Date Range</label>
+            <input type="text" id="datePicker" placeholder="Select dates">
         </div>
         <div class="btn-group">
             <button class="action-btn refresh-btn" onclick="loadData()">
-                <i class="fa fa-sync-alt"></i> REFRESH DATA
+                <i class="fa fa-sync-alt"></i> REFRESH
             </button>
             <button class="action-btn reset-btn" onclick="clearFilters()">
                 <i class="fa fa-undo"></i> RESET
@@ -218,10 +214,10 @@
     <div class="metrics-grid">
         <div class="metric-card">
             <h2 id="totalEntries">0</h2>
-            <p>TOTAL ENTRIES</p>
+            <p>TOTAL ORDERS</p>
         </div>
         <div class="analysis-card">
-            <h3>Top 5 Regions by Order Volume</h3>
+            <h3>Top 5 Regional Distribution</h3>
             <div id="regionList" class="top-regions"></div>
         </div>
     </div>
@@ -231,228 +227,122 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th class="col-date">Date</th>
-                        <th class="col-prod">Product Name</th>
-                        <th class="col-name">Customer</th>
-                        <th class="col-email">Email Address</th>
-                        <th class="col-mobile">Mobile</th>
-                        <th class="col-order">Order ID</th>
-                        <th class="col-source">Source</th>
-                        <th class="col-plat">Platform</th>
-                        <th class="col-state">State</th>
-                        <th class="col-pin">Pin</th>
+                        <th class="w-date">Date</th>
+                        <th class="w-prod">Product</th>
+                        <th class="w-name">Customer</th>
+                        <th class="w-email">Email</th>
+                        <th class="w-mobile">Mobile</th>
+                        <th class="w-order">Order ID</th>
+                        <th class="w-source">Source</th>
+                        <th class="w-plat">Platform</th>
+                        <th class="w-state">State</th>
+                        <th class="w-pin">Pin</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    </tbody>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-    /**
-     * DASHBOARD ENGINE v2.0
-     * Features: 10-Column Sync, Proper Case Formatting, Chronological Sort, Robust CSV Parsing
-     */
-
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=1747140024&single=true&output=csv';
     let rawData = [];
 
-    // Initialize the Calendar Range Picker
     const fp = flatpickr("#datePicker", {
-        mode: "range",
-        dateFormat: "d/m/Y",
-        onClose: function(selectedDates) {
-            if (selectedDates.length === 2 || selectedDates.length === 0) {
-                processData();
-            }
-        }
+        mode: "range", dateFormat: "d/m/Y", onClose: processData
     });
 
-    /**
-     * Robust CSV Parser
-     * Corrects issues with commas inside quotes (e.g., product descriptions)
-     */
     function parseCSV(text) {
         const result = [];
         let row = [''];
-        let i = 0;
-        let quote = false;
-
+        let i = 0, quote = false;
         for (let char of text) {
-            if (char === '"') {
-                quote = !quote;
-            } else if (char === ',' && !quote) {
-                row.push('');
-                i++;
-            } else if (char === '\n' && !quote) {
-                result.push(row);
-                row = [''];
-                i = 0;
-            } else {
-                row[i] += char;
-            }
+            if (char === '"') quote = !quote;
+            else if (char === ',' && !quote) { row.push(''); i++; }
+            else if (char === '\n' && !quote) { result.push(row); row = ['']; i = 0; }
+            else row[i] += char;
         }
         if (row.length > 1) result.push(row);
         return result;
     }
 
-    /**
-     * Formatting Utility: Proper Case
-     */
-    function toTitleCase(str) {
-        if (!str) return "";
-        return str.toLowerCase().split(' ').map(word => {
-            return (word.charAt(0).toUpperCase() + word.slice(1));
-        }).join(' ');
-    }
-
-    /**
-     * Date Parser for DD/MM/YYYY
-     */
-    function convertToDate(str) {
-        if (!str || str.trim() === "") return new Date(0);
-        const parts = str.split('/');
-        return new Date(parts[2], parts[1] - 1, parts[0]);
-    }
-
-    /**
-     * Core Data Loader
-     */
     async function loadData() {
-        const overlay = document.getElementById('loadingOverlay');
-        overlay.style.display = 'flex';
-
+        document.getElementById('loadingOverlay').style.display = 'flex';
         try {
-            // Fetch with Cache Busting
-            const response = await fetch(csvUrl + '&cb=' + new Date().getTime());
-            const text = await response.text();
+            const res = await fetch(csvUrl + '&cb=' + Date.now());
+            const text = await res.text();
             const rows = parseCSV(text);
-
-            // Mapping indices: 
-            // Purchase Date(3), OrderID(4), FullName(5), Mobile(6), Email(8), 
-            // Platform(9), Source(12), State(13), Pin(14), ProdName(16)
-            rawData = rows.slice(1).map(col => {
-                const name = (col[5] || "").trim();
-                return {
-                    dateStr: (col[3] || "").trim(),
-                    dateObj: convertToDate((col[3] || "").trim()),
-                    orderId: (col[4] || "").trim(),
-                    fullName: toTitleCase(name),
-                    mobile: (col[6] || "").trim(),
-                    email: (col[8] || "").trim().toLowerCase(),
-                    platform: (col[9] || "").trim(),
-                    source: (col[12] || "").trim(), // Column M
-                    state: (col[13] || "").trim(),
-                    pin: (col[14] || "").trim(),
-                    product: (col[16] || "").trim(),
-                    searchBlob: col.join(' ').toLowerCase()
-                };
-            }).filter(item => item.fullName !== "" && item.fullName !== "Full Name");
+            
+            rawData = rows.slice(1).map(c => ({
+                dtStr: (c[3]||'').trim(),
+                dtObj: new Date((c[3]||'').split('/').reverse().join('-')),
+                nm: (c[5]||'').trim().toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                em: (c[8]||'').trim().toLowerCase(),
+                ph: (c[6]||'').trim(),
+                id: (c[4]||'').trim(),
+                src: (c[12]||'').trim(), 
+                pl: (c[9]||'').trim(),
+                st: (c[13]||'').trim(),
+                pn: (c[14]||'').trim(),
+                pName: (c[16]||'').trim(),
+                blob: c.join(' ').toLowerCase()
+            })).filter(r => r.nm !== "" && r.nm !== "Full Name");
 
             processData();
-        } catch (error) {
-            console.error("Dashboard Load Error:", error);
-            alert("Failed to sync data. Please check connection.");
-        } finally {
-            setTimeout(() => { overlay.style.display = 'none'; }, 500);
-        }
+        } catch (e) { console.error(e); }
+        finally { setTimeout(() => { document.getElementById('loadingOverlay').style.display = 'none'; }, 500); }
     }
 
-    /**
-     * Filtering and Sorting Logic
-     */
     function processData() {
         let filtered = [...rawData];
-
-        // 1. Keyword Search
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        if (searchTerm) {
-            filtered = filtered.filter(item => item.searchBlob.includes(searchTerm));
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        if (search) filtered = filtered.filter(r => r.blob.includes(search));
+        
+        const range = fp.selectedDates;
+        if (range.length === 2) {
+            filtered = filtered.filter(r => r.dtObj >= range[0] && r.dtObj <= range[1]);
         }
-
-        // 2. Date Range Filter
-        const dates = fp.selectedDates;
-        if (dates.length === 2) {
-            const start = dates[0].getTime();
-            const end = dates[1].getTime();
-            filtered = filtered.filter(item => {
-                const itemTime = item.dateObj.getTime();
-                return itemTime >= start && itemTime <= end;
-            });
-        }
-
-        // 3. Chronological Sort (Oldest entries at the top)
-        filtered.sort((a, b) => a.dateObj - b.dateObj);
-
-        updateUI(filtered);
+        
+        filtered.sort((a, b) => a.dtObj - b.dtObj);
+        render(filtered);
     }
 
-    /**
-     * UI Rendering Engine
-     */
-    function updateUI(data) {
-        // Update Total Metric
+    function render(data) {
         document.getElementById('totalEntries').innerText = data.length.toLocaleString();
-
-        // Update Table
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = data.map(item => `
+        document.getElementById('tableBody').innerHTML = data.map(r => `
             <tr>
-                <td class="col-date">${item.dateStr}</td>
-                <td class="col-prod" title="${item.product}">${item.product}</td>
-                <td class="col-name"><strong>${item.fullName}</strong></td>
-                <td class="col-email">${item.email}</td>
-                <td class="col-mobile">${item.mobile}</td>
-                <td class="col-order" style="color:var(--accent-blue); font-weight:bold;">${item.orderId}</td>
-                <td class="col-source">${item.source}</td>
-                <td class="col-plat">${item.platform}</td>
-                <td class="col-state">${item.state}</td>
-                <td class="col-pin">${item.pin}</td>
+                <td class="w-date">${r.dtStr}</td>
+                <td class="w-prod" title="${r.pName}">${r.pName}</td>
+                <td class="w-name"><strong>${r.nm}</strong></td>
+                <td class="w-email">${r.em}</td>
+                <td class="w-mobile">${r.ph}</td>
+                <td class="w-order" style="color:var(--accent-blue); font-weight:bold;">${r.id}</td>
+                <td class="w-source">${r.src}</td>
+                <td class="w-plat">${r.pl}</td>
+                <td class="w-state">${r.st}</td>
+                <td class="w-pin">${r.pn}</td>
             </tr>
         `).join('');
 
-        // Regional Analysis Logic
         const counts = {};
-        data.forEach(item => {
-            if (item.state) {
-                counts[item.state] = (counts[item.state] || 0) + 1;
-            }
-        });
-
-        const top5 = Object.entries(counts)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5);
-
-        const regionList = document.getElementById('regionList');
-        if (top5.length > 0) {
-            regionList.innerHTML = top5.map(entry => `
-                <div class="region-item">
-                    <span class="val">${entry[1]}</span>
-                    <span class="lbl">${entry[0]}</span>
-                </div>
-            `).join('');
-        } else {
-            regionList.innerHTML = `<p style="color:#95a5a6; font-size:12px;">No regional data available.</p>`;
-        }
+        data.forEach(r => { if(r.st) counts[r.st] = (counts[r.st] || 0) + 1; });
+        const top5 = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+        document.getElementById('regionList').innerHTML = top5.map(reg => `
+            <div class="region-item">
+                <span class="val">${reg[1]}</span>
+                <span class="lbl">${reg[0]}</span>
+            </div>
+        `).join('');
     }
 
-    /**
-     * Filter Reset
-     */
     function clearFilters() {
         document.getElementById('searchInput').value = '';
         fp.clear();
         processData();
     }
 
-    // Auto-Init
     window.onload = loadData;
-
-    // Background auto-refresh every 10 minutes
-    setInterval(loadData, 600000);
-
 </script>
 </body>
 </html>
