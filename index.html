@@ -2,120 +2,102 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FEDUS | 2026 Operations Dashboard</title>
+    <title>FEDUS | 2026 Analytics</title>
     <style>
-        :root { 
-            --fedus-blue: #3498db; 
-            --fedus-orange: #f39c12; 
-            --fedus-green: #27ae60; 
-            --bg: #f4f7f6; 
-            --header-text: #ffffff;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 10px 30px; border-radius: 12px; color: var(--header-text); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .logo-area { display: flex; align-items: center; gap: 12px; }
-        
-        /* Updated Logo Styling */
-        .logo-img { height: 50px; width: auto; border-radius: 4px; }
-        
-        .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .sync-pill { background: rgba(255, 255, 255, 0.2); color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; border: 1px solid white; font-weight: 600; }
-        
-        .highlights-container { display: grid; grid-template-columns: 1fr 2fr 1.5fr; gap: 20px; margin-bottom: 25px; }
-        
-        .kpi-card { background: var(--fedus-orange); padding: 20px; border-radius: 12px; color: white; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3); }
-        
-        .analytics-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .analytics-card h3 { margin-top: 0; font-size: 14px; color: var(--fedus-blue); text-transform: uppercase; border-bottom: 2px solid #f4f7f6; padding-bottom: 8px; margin-bottom: 10px; }
-        
-        .stat-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; border-bottom: 1px solid #eee; }
-        .bar-bg { background: #eee; height: 8px; border-radius: 4px; margin-top: 4px; overflow: hidden; }
-        .bar-fill { background: var(--fedus-blue); height: 100%; border-radius: 4px; }
-        .bar-fill.orange { background: var(--fedus-orange); }
+        :root { --fedus-blue: #0a111f; --fedus-green: #27ae60; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 100%; margin: auto; }
 
-        .search-box { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 15px 30px; border-radius: 12px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .logo-area img { height: 45px; }
+        .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         
-        .table-wrap { background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; }
-        .table-scroll { overflow-y: auto; overflow-x: auto; max-height: 500px; position: relative; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
-        th { background: #f8f9fa; position: sticky; top: 0; z-index: 100; padding: 12px; text-align: left; border-bottom: 2px solid #eee; }
-        td { padding: 10px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Summary Section */
+        .summary-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 30px; }
+        .lifetime-card { background: linear-gradient(135deg, #1c2d41 0%, #0a111f 100%); padding: 30px; border-radius: 15px; color: white; text-align: center; min-width: 320px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .lifetime-card h2 { margin: 0; font-size: 48px; }
+        .lifetime-card p { margin: 5px 0 0; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8; font-size: 13px; }
+
+        /* Platform Breakdown */
+        .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; }
+        .plat-card { background: white; padding: 18px; border-radius: 12px; border: 1px solid #ddd; text-align: center; border-top: 5px solid var(--fedus-green); transition: 0.3s; }
+        .plat-card:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
+        .plat-card h4 { margin: 0; font-size: 12px; color: #777; text-transform: uppercase; }
+        .plat-card div { font-size: 28px; font-weight: bold; color: var(--fedus-blue); margin-top: 10px; }
+
+        /* Controls & Table */
+        .search-box { width: 100%; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ddd; font-size: 16px; outline: none; }
+        .table-wrap { background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .table-scroll { overflow-x: auto; max-height: 600px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+        th { background: #f8f9fa; position: sticky; top: 0; padding: 15px 12px; text-align: left; border-bottom: 2px solid #eee; z-index: 5; }
+        td { padding: 14px 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         tr:hover { background-color: #f9fbfc; }
 
-        .col-dt { width: 90px; } .col-nm { width: 140px; } .col-ph { width: 100px; }
-        .col-ap { width: 100px; } .col-em { width: 160px; } .col-pl { width: 90px; }
-        .col-id { width: 140px; } .col-sc { width: 90px; } .col-st { width: 100px; }
-        .col-pn { width: 70px; } .col-pr { width: 150px; } .col-pc { width: 100px; }
-        .col-pf { width: 100px; }
-
-        .invoice-link { color: #3498db; text-decoration: none; font-weight: bold; }
+        /* Specific Widths for 9 Columns */
+        .col-dt { width: 120px; } .col-nm { width: 160px; } .col-ph { width: 110px; }
+        .col-em { width: 200px; } .col-id { width: 160px; } .col-sc { width: 100px; }
+        .col-pl { width: 110px; } .col-st { width: 120px; } .col-pn { width: 85px; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="logo-area">
-        <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="FEDUS Logo" class="logo-img">
-        <h2 style="margin:0; font-weight: 600; letter-spacing: 0.5px;">Operations Dashboard</h2>
-    </div>
-    <div class="header-actions">
-        <span id="syncStatus" class="sync-pill">CONNECTING...</span>
-        <button class="refresh-btn" onclick="fetchData()">🔄 REFRESH</button>
-    </div>
-</div>
-
-<div class="highlights-container">
-    <div class="kpi-card">
-        <h2 id="totalCount" style="margin:0; font-size:48px;">0</h2>
-        <p style="margin:0; text-transform:uppercase; font-size:12px; font-weight:bold;">Total Entries</p>
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="FEDUS">
+        </div>
+        <div class="header-actions">
+            <span id="syncStatus" style="font-size: 11px; margin-right: 15px; font-weight: 600;">LOADING...</span>
+            <button class="refresh-btn" onclick="fetchData()">🔄 REFRESH DATA</button>
+        </div>
     </div>
 
-    <div class="analytics-card">
-        <h3>Order Platform Wise</h3>
-        <div id="platformStats"></div>
+    <div class="summary-layout">
+        <div class="lifetime-card">
+            <h2 id="totalCount">0</h2>
+            <p>Lifetime Entries</p>
+        </div>
+        <div id="platformBreakdown" class="platform-grid"></div>
     </div>
 
-    <div class="analytics-card">
-        <h3>Top 5 Regions</h3>
-        <div id="regionStats"></div>
-    </div>
-</div>
+    <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search by Name, Order ID, State, or Platform..." onkeyup="filterData()">
 
-<input type="text" id="searchInput" class="search-box" placeholder="🔍 Search records..." onkeyup="filterData()">
-
-<div class="table-wrap">
-    <div class="table-scroll">
-        <table>
-            <thead>
-                <tr>
-                    <th class="col-dt">Date</th><th class="col-nm">Name</th><th class="col-ph">Phone</th>
-                    <th class="col-ap">Alt Phone</th><th class="col-em">Email</th><th class="col-pl">Platform</th>
-                    <th class="col-id">Order ID</th><th class="col-sc">Source</th><th class="col-st">State</th>
-                    <th class="col-pn">Pin</th><th class="col-pr">Product</th><th class="col-pc">Code</th>
-                    <th class="col-pf">Invoice</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-dt">Date</th>
+                        <th class="col-nm">Full Name</th>
+                        <th class="col-ph">Mobile</th>
+                        <th class="col-em">Email</th>
+                        <th class="col-id">Order ID</th>
+                        <th class="col-sc">Source</th>
+                        <th class="col-pl">Platform</th>
+                        <th class="col-st">State</th>
+                        <th class="col-pn">Pin</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=1747140024&single=true&output=csv';
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=0&single=true&output=csv';
     let masterData = [];
 
     async function fetchData() {
         try {
-            const response = await fetch(csvUrl + '&cb=' + Date.now());
-            const text = await response.text();
+            const res = await fetch(csvUrl + '&cb=' + Date.now());
+            const text = await res.text();
             masterData = parseCSV(text);
-            updateDashboard(masterData);
-            document.getElementById('syncStatus').innerText = "LIVE: " + new Date().toLocaleTimeString();
-        } catch (e) { 
-            document.getElementById('syncStatus').innerText = "OFFLINE"; 
-        }
+            renderDashboard(masterData);
+            document.getElementById('syncStatus').innerText = "LAST SYNC: " + new Date().toLocaleTimeString();
+        } catch (e) { document.getElementById('syncStatus').innerText = "CONNECTION ERROR"; }
     }
 
     function parseCSV(text) {
@@ -132,91 +114,53 @@
         }
         if (val || cur.length > 0) { cur.push(val); rows.push(cur); }
         
+        // Mapped to your specific Sheet structure
         return rows.slice(1).map(c => ({
-            dt: (c[1]||'').trim(), nm: (c[2]||'').trim(), ph: (c[3]||'').trim(),
-            ap: (c[4]||'').trim(), em: (c[5]||'').trim(), pl: (c[6]||'').trim(),
-            id: (c[7]||'').trim(), pf: (c[8]||'').trim(), sc: (c[9]||'').trim(),
-            st: (c[10]||'').trim(), pn: (c[11]||'').trim(), pr: (c[12]||'').trim(),
-            pc: (c[13]||'').trim()
+            dt: (c[3]||'').trim(), // Purchase Date
+            nm: (c[5]||'').trim(), // Full Name
+            ph: (c[6]||'').trim(), // Mobile Number
+            em: (c[8]||'').trim(), // Email
+            id: (c[4]||'').trim(), // Order ID
+            sc: (c[12]||'').trim(),// Source
+            pl: (c[9]||'Other').trim(), // Platform
+            st: (c[13]||'').trim(),// State
+            pn: (c[14]||'').trim() // Pin
         })).filter(r => r.nm !== "");
     }
 
-    function stringToDate(dateStr) {
-        const parts = dateStr.split('/');
-        if(parts.length < 3) return new Date(0);
-        const [day, month, year] = parts;
-        return new Date(year, month - 1, day);
-    }
-
-    function updateDashboard(data) {
-        // --- OLDEST FIRST SORTING ---
-        const sortedData = [...data].sort((a, b) => {
-            return stringToDate(a.dt) - stringToDate(b.dt);
-        });
-
+    function renderDashboard(data) {
         const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = sortedData.map(r => {
-            const invoiceLink = r.pf.startsWith('http') ? `<a href="${r.pf}" target="_blank" class="invoice-link">View File</a>` : 'No File';
-            return `
+        tbody.innerHTML = data.map(r => `
             <tr>
                 <td class="col-dt">${r.dt}</td>
                 <td class="col-nm"><strong>${r.nm}</strong></td>
                 <td class="col-ph">${r.ph}</td>
-                <td class="col-ap">${r.ap}</td>
                 <td class="col-em">${r.em}</td>
-                <td class="col-pl">${r.pl}</td>
                 <td class="col-id" style="color:#2980b9; font-weight:bold;">${r.id}</td>
                 <td class="col-sc">${r.sc}</td>
+                <td class="col-pl"><strong>${r.pl}</strong></td>
                 <td class="col-st">${r.st}</td>
                 <td class="col-pn">${r.pn}</td>
-                <td class="col-pr">${r.pr}</td>
-                <td class="col-pc">${r.pc}</td>
-                <td class="col-pf">${invoiceLink}</td>
-            </tr>`;
-        }).join('');
-        
-        document.getElementById('totalCount').innerText = sortedData.length;
-        renderAnalytics(sortedData);
-    }
+            </tr>
+        `).join('');
 
-    function renderAnalytics(data) {
-        const platforms = {};
-        data.forEach(r => { if(r.pl) platforms[r.pl] = (platforms[r.pl] || 0) + 1; });
-        const platSorted = Object.entries(platforms).sort((a,b) => b[1] - a[1]);
-        
-        const platContainer = document.getElementById('platformStats');
-        platContainer.innerHTML = platSorted.map(([name, count]) => {
-            const pct = (count / data.length) * 100;
-            return `
-                <div class="stat-item"><span>${name}</span><strong>${count}</strong></div>
-                <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
-            `;
-        }).join('');
+        document.getElementById('totalCount').innerText = data.length;
 
-        const regions = {};
-        data.forEach(r => { if(r.st) regions[r.st] = (regions[r.st] || 0) + 1; });
-        const regSorted = Object.entries(regions).sort((a,b) => b[1] - a[1]).slice(0, 5);
-        
-        const regContainer = document.getElementById('regionStats');
-        regContainer.innerHTML = regSorted.map(([name, count]) => {
-            const pct = (count / data.length) * 100;
-            return `
-                <div class="stat-item"><span>${name}</span><strong>${count} Orders</strong></div>
-                <div class="bar-bg"><div class="bar-fill orange" style="width:${pct}%"></div></div>
-            `;
-        }).join('');
+        const counts = {};
+        data.forEach(r => { counts[r.pl] = (counts[r.pl] || 0) + 1; });
+        document.getElementById('platformBreakdown').innerHTML = Object.keys(counts).map(p => `
+            <div class="plat-card"><h4>${p}</h4><div>${counts[p]}</div></div>
+        `).join('');
     }
 
     function filterData() {
         const query = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = masterData.filter(row => 
-            Object.values(row).some(val => val.toLowerCase().includes(query))
-        );
-        updateDashboard(filtered);
+        const filtered = masterData.filter(r => Object.values(r).some(v => v.toLowerCase().includes(query)));
+        renderDashboard(filtered);
     }
 
     window.onload = fetchData;
-    setInterval(fetchData, 60000); 
+    setInterval(fetchData, 60000); // Auto-sync every minute
 </script>
 </body>
 </html>
