@@ -301,7 +301,11 @@
         
         const range = fp.selectedDates;
         if (range.length === 2) {
-            filtered = filtered.filter(r => r.dtObj >= range[0] && r.dtObj <= range[1]);
+            const startDate = new Date(range[0]);
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date(range[1]);
+            endDate.setHours(23, 59, 59, 999);
+            filtered = filtered.filter(r => r.dtObj >= startDate && r.dtObj <= endDate);
         }
         
         filtered.sort((a, b) => a.dtObj - b.dtObj);
