@@ -2,44 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FEDUS | 2026 Operations Dashboard</title>
+    <title>FEDUS | 2026 Inventory Dashboard</title>
     <style>
         :root { --fedus-blue: #0a111f; --fedus-green: #27ae60; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         .container { max-width: 100%; margin: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--fedus-blue); padding: 15px 30px; border-radius: 12px; color: white; }
         .logo-area img { height: 45px; }
-        .refresh-btn { background: var(--fedus-green); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .search-box { padding: 10px; width: 300px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 20px; }
         .summary-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 30px; }
-        .lifetime-card { background: #1c2d41; padding: 30px; border-radius: 15px; color: white; text-align: center; min-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .lifetime-card h2 { margin: 0; font-size: 52px; color: #fff; }
+        .lifetime-card { background: #1c2d41; padding: 30px; border-radius: 15px; color: white; text-align: center; min-width: 320px; }
         .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; }
         .plat-card { background: white; padding: 15px; border-radius: 12px; border: 1px solid #ddd; text-align: center; border-top: 5px solid var(--fedus-green); }
         .table-wrap { background: white; border-radius: 12px; border: 1px solid #ddd; overflow: hidden; }
         .table-scroll { overflow-x: auto; max-height: 600px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #f8f9fa; position: sticky; top: 0; padding: 15px 12px; text-align: left; border-bottom: 2px solid #eee; z-index: 10; }
-        td { padding: 12px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #f8f9fa; position: sticky; top: 0; padding: 12px; text-align: left; border-bottom: 2px solid #eee; z-index: 10; }
+        td { padding: 10px; border-bottom: 1px solid #f1f1f1; white-space: nowrap; }
+        .prod-cell { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <div class="logo-area"><img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="FEDUS"></div>
-        <button class="refresh-btn" onclick="fetchData()">🔄 REFRESH DATA</button>
+        <input type="text" id="searchInput" class="search-box" placeholder="Search orders, names, or products..." onkeyup="filterTable()">
     </div>
 
     <div class="summary-layout">
-        <div class="lifetime-card"><h2 id="totalCount">...</h2><p>LIFETIME ENTRIES</p></div>
+        <div class="lifetime-card"><h2 id="totalCount">...</h2><p>TOTAL ORDERS</p></div>
         <div id="platformBreakdown" class="platform-grid"></div>
     </div>
 
     <div class="table-wrap">
         <div class="table-scroll">
-            <table>
+            <table id="dataTable">
                 <thead>
                     <tr>
-                        <th>Date</th><th>Full Name</th><th>Mobile</th><th>Email</th><th>Order ID</th><th>Source</th><th>Platform</th><th>State</th><th>Pin</th>
+                        <th>Date</th><th>Product Name</th><th>Product Code</th><th>Full Name</th><th>Mobile</th><th>Order ID</th><th>Platform</th><th>State</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -51,7 +51,6 @@
 <script>
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=1747140024&single=true&output=csv';
 
-    // Advanced CSV Parser to handle new-lines in product names
     function parseRobustCSV(text) {
         const result = [];
         let row = [''];
@@ -72,28 +71,41 @@
             const text = await res.text();
             const allRows = parseRobustCSV(text);
             
-            // Mapping: D=3, F=5, G=6, I=8, E=4, M=12, J=9, N=13, O=14
+            // Mapping: D=3, F=5, G=6, E=4, J=9, N=13, Q=16, R=17
             const data = allRows.slice(1).map(c => ({
                 dt: (c[3]||'').trim(), nm: (c[5]||'').trim(), ph: (c[6]||'').trim(),
-                em: (c[8]||'').trim(), id: (c[4]||'').trim(), sc: (c[12]||'').trim(),
-                pl: (c[9]||'Other').trim(), st: (c[13]||'').trim(), pn: (c[14]||'').trim()
+                id: (c[4]||'').trim(), pl: (c[9]||'Other').trim(), st: (c[13]||'').trim(),
+                pName: (c[16]||'').trim(), pCode: (c[17]||'').trim()
             })).filter(r => r.nm !== "" && r.nm !== "Full Name");
 
             document.getElementById('totalCount').innerText = data.length;
             document.getElementById('tableBody').innerHTML = data.map(r => `
-                <tr><td>${r.dt}</td><td><strong>${r.nm}</strong></td><td>${r.ph}</td><td>${r.em}</td>
-                <td style="color:#2980b9;font-weight:bold;">${r.id}</td><td>${r.sc}</td><td>${r.pl}</td><td>${r.st}</td><td>${r.pn}</td></tr>
+                <tr>
+                    <td>${r.dt}</td>
+                    <td class="prod-cell" title="${r.pName}">${r.pName}</td>
+                    <td><code>${r.pCode}</code></td>
+                    <td><strong>${r.nm}</strong></td>
+                    <td>${r.ph}</td>
+                    <td>${r.id}</td>
+                    <td>${r.pl}</td>
+                    <td>${r.st}</td>
+                </tr>
             `).join('');
 
             const counts = {};
-            data.forEach(r => { 
-                let p = r.pl || 'Other';
-                counts[p] = (counts[p] || 0) + 1; 
-            });
+            data.forEach(r => { counts[r.pl] = (counts[r.pl] || 0) + 1; });
             document.getElementById('platformBreakdown').innerHTML = Object.keys(counts).map(p => `
                 <div class="plat-card"><h4>${p}</h4><div>${counts[p]}</div></div>
             `).join('');
-        } catch (e) { console.error("Load Error", e); }
+        } catch (e) { console.error(e); }
+    }
+
+    function filterTable() {
+        let input = document.getElementById("searchInput").value.toUpperCase();
+        let tr = document.getElementById("tableBody").getElementsByTagName("tr");
+        for (let i = 0; i < tr.length; i++) {
+            tr[i].style.display = tr[i].innerText.toUpperCase().indexOf(input) > -1 ? "" : "none";
+        }
     }
     window.onload = fetchData;
 </script>
