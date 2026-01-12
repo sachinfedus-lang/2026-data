@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FEDUS | Operations Analytics</title>
+    <title>FEDUS | Exclusive Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
@@ -30,7 +30,7 @@
         .header img { height: 50px; }
 
         /* Dashboard Layout */
-        .container { padding: 25px; max-width: 1600px; margin: auto; }
+        .container { padding: 25px; max-width: 100%; margin: auto; box-sizing: border-box; }
         
         .controls-row {
             display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; align-items: flex-end;
@@ -70,8 +70,8 @@
         .table-scroll { overflow-x: auto; max-height: 600px; }
 
         table { 
-            width: 100%; border-collapse: collapse; table-layout: fixed; /* Forces fixed widths */
-            font-size: 13px;
+            width: 100%; border-collapse: collapse; table-layout: fixed;
+            font-size: 12.5px;
         }
 
         th { 
@@ -84,17 +84,18 @@
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* Fixed Width Definitions */
-        .col-date { width: 90px; }
-        .col-name { width: 150px; }
-        .col-prod { width: 250px; }
-        .col-email { width: 180px; }
-        .col-order { width: 150px; }
-        .col-mobile { width: 110px; }
-        .col-platform { width: 100px; }
-        .col-state { width: 120px; }
+        /* Balanced Column Widths */
+        .col-date { width: 85px; }
+        .col-prod { width: 220px; }
+        .col-name { width: 140px; }
+        .col-email { width: 170px; }
+        .col-mobile { width: 100px; }
+        .col-order { width: 140px; }
+        .col-platform { width: 90px; }
+        .col-state { width: 110px; }
+        .col-pin { width: 75px; }
 
-        /* Hover Effect for Long Text */
+        /* Hover Effect for long entries */
         td:hover { 
             overflow: visible; white-space: normal; position: relative; 
             background: #fff !important; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -110,21 +111,21 @@
 
 <div class="header">
     <img src="https://raw.githubusercontent.com/sachinfedus-lang/2026-data/main/logo.png" alt="FEDUS">
-    <div style="color: white; font-weight: bold; font-size: 20px;">2026 OPERATIONS PORTAL</div>
+    <div style="color: white; font-weight: bold; font-size: 20px; letter-spacing: 1px;">EXCLUSIVE DASHBOARD</div>
 </div>
 
 <div class="container">
     
     <div class="controls-row">
         <div class="input-group">
-            <label>Search Anything</label>
-            <input type="text" id="searchInput" placeholder="Search name, code, order..." onkeyup="processData()">
+            <label>Search Everything</label>
+            <input type="text" id="searchInput" placeholder="Search name, product, code..." onkeyup="processData()">
         </div>
         <div class="input-group">
-            <label>Filter by Date Range</label>
-            <input type="text" id="datePicker" placeholder="Select Date Range">
+            <label>Calendar Range</label>
+            <input type="text" id="datePicker" placeholder="Select dates">
         </div>
-        <button onclick="clearFilters()" style="padding: 10px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+        <button onclick="clearFilters()" style="margin-bottom:2px; padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">RESET</button>
     </div>
 
     <div class="metrics-container">
@@ -133,7 +134,7 @@
             <p>TOTAL ENTRIES</p>
         </div>
         <div class="card" style="text-align: left;">
-            <p style="margin-bottom: 10px;">TOP 5 REGIONS</p>
+            <p style="margin-bottom: 10px; color: var(--fedus-orange);">TOP 5 REGIONS</p>
             <div id="regionList" class="top-regions"></div>
         </div>
     </div>
@@ -145,12 +146,13 @@
                     <tr>
                         <th class="col-date">Date</th>
                         <th class="col-prod">Product Name</th>
-                        <th class="col-name">Customer Name</th>
+                        <th class="col-name">Customer</th>
                         <th class="col-email">Email</th>
                         <th class="col-mobile">Mobile</th>
                         <th class="col-order">Order ID</th>
                         <th class="col-platform">Platform</th>
                         <th class="col-state">State</th>
+                        <th class="col-pin">Pin</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -163,7 +165,6 @@
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=1747140024&single=true&output=csv';
     let rawData = [];
 
-    // Initialize Date Picker
     const fp = flatpickr("#datePicker", {
         mode: "range",
         dateFormat: "d/m/Y",
@@ -184,7 +185,6 @@
         return result;
     }
 
-    // Helper to convert DD/MM/YYYY to Date Object for sorting/filtering
     function parseDateStr(str) {
         if (!str) return new Date(0);
         const parts = str.split('/');
@@ -206,6 +206,7 @@
                 id: (c[4]||'').trim(),
                 pl: (c[9]||'').trim(),
                 st: (c[13]||'').trim(),
+                pn: (c[14]||'').trim(),
                 pName: (c[16]||'').trim(),
                 all: c.join(' ').toLowerCase()
             })).filter(r => r.nm !== "" && r.nm !== "Full Name");
@@ -217,13 +218,11 @@
     function processData() {
         let filtered = [...rawData];
 
-        // 1. Filter by Search
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         if (searchTerm) {
             filtered = filtered.filter(r => r.all.includes(searchTerm));
         }
 
-        // 2. Filter by Date Range
         const range = fp.selectedDates;
         if (range.length === 2) {
             const start = range[0].getTime();
@@ -234,7 +233,7 @@
             });
         }
 
-        // 3. Sort by Date (Oldest to Newest)
+        // Chronological Sorting (Oldest entries at the top)
         filtered.sort((a, b) => a.dtObj - b.dtObj);
 
         renderDashboard(filtered);
@@ -243,7 +242,6 @@
     function renderDashboard(data) {
         document.getElementById('totalEntries').innerText = data.length;
 
-        // Render Table
         document.getElementById('tableBody').innerHTML = data.map(r => `
             <tr>
                 <td class="col-date">${r.dtStr}</td>
@@ -254,10 +252,10 @@
                 <td class="col-order">${r.id}</td>
                 <td class="col-platform">${r.pl}</td>
                 <td class="col-state">${r.st}</td>
+                <td class="col-pin">${r.pn}</td>
             </tr>
         `).join('');
 
-        // Calculate Top Regions
         const counts = {};
         data.forEach(r => { if(r.st) counts[r.st] = (counts[r.st] || 0) + 1; });
         const top5 = Object.entries(counts)
@@ -266,8 +264,8 @@
 
         document.getElementById('regionList').innerHTML = top5.map(reg => `
             <div class="region-item">
-                <div style="font-size:12px; color:#7f8c8d;">${reg[0]}</div>
-                <div style="font-size:18px; font-weight:bold;">${reg[1]}</div>
+                <div style="font-size:11px; color:#7f8c8d;">${reg[0]}</div>
+                <div style="font-size:18px; font-weight:bold; color:var(--accent-blue);">${reg[1]}</div>
             </div>
         `).join('');
     }
@@ -279,6 +277,7 @@
     }
 
     window.onload = loadData;
+    setInterval(loadData, 300000); 
 </script>
 </body>
 </html>
