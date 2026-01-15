@@ -170,6 +170,7 @@
         .w-plat { width: 95px; }
         .w-state { width: 115px; }
         .w-pin { width: 75px; }
+        .w-code { width: 120px; }
 
         td:hover { 
             overflow: visible; white-space: normal; position: relative; 
@@ -212,7 +213,7 @@
     <div class="toolbar">
         <div class="input-group">
             <label><i class="fa fa-search"></i> Search Database</label>
-            <input type="text" id="searchInput" placeholder="Search customer, order ID, product..." onkeyup="processData()">
+            <input type="text" id="searchInput" placeholder="Search customer, order ID, product code..." onkeyup="processData()">
         </div>
         <div class="input-group">
             <label><i class="fa fa-calendar-alt"></i> Date Range</label>
@@ -259,6 +260,7 @@
                         <th class="w-plat">Platform</th>
                         <th class="w-state">State</th>
                         <th class="w-pin">Pin</th>
+                        <th class="w-code">Product Code</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -270,7 +272,7 @@
 <script>
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=1747140024&single=true&output=csv';
     let rawData = [];
-    let platformWoW = {}; // Global store for platform trends
+    let platformWoW = {};
 
     const fp = flatpickr("#datePicker", {
         mode: "range", dateFormat: "d/m/Y", onClose: processData
@@ -308,7 +310,8 @@
                 pl: (c[9]||'').trim(),                       
                 st: (c[12]||'').trim(),                      
                 pn: (c[13]||'').trim(),                      
-                pName: (c[15]||'').trim(),                   
+                pName: (c[15]||'').trim(),
+                pCode: (c[16]||'').trim(),                   
                 blob: c.join(' ').toLowerCase()
             })).filter(r => r.nm !== "" && r.nm !== "Full Name");
 
@@ -323,7 +326,6 @@
         const last7Days = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
         const prev7Days = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000));
 
-        // Helper to get platform count in a period
         const getStats = (start, end) => {
             const range = rawData.filter(r => r.dtObj >= start && r.dtObj < end);
             return {
@@ -336,7 +338,6 @@
         const current = getStats(last7Days, new Date(now.getTime() + 86400000));
         const previous = getStats(prev7Days, last7Days);
 
-        // Overall Growth
         const percentChange = previous.total > 0 ? ((current.total - previous.total) / previous.total * 100) : 0;
         const isPositive = percentChange >= 0;
         
@@ -346,7 +347,6 @@
                 ${isPositive ? '+' : ''}${percentChange.toFixed(1)}% vs last 7 days
             </span>`;
 
-        // Store Platform WoW for render function
         const calcPlatChange = (curr, prev) => prev > 0 ? ((curr - prev) / prev * 100).toFixed(0) : "0";
         platformWoW = {
             "Amazon": calcPlatChange(current.amazon, previous.amazon),
@@ -387,6 +387,7 @@
                 <td class="w-plat">${r.pl}</td>
                 <td class="w-state">${r.st}</td>
                 <td class="w-pin">${r.pn}</td>
+                <td class="w-code">${r.pCode}</td>
             </tr>
         `).join('');
 
