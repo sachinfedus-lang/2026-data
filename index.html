@@ -105,7 +105,7 @@
         .metric-card h2 { margin: 0; font-size: 56px; color: var(--accent-blue); line-height: 1; }
         .metric-card p { margin: 10px 0 0; font-weight: bold; color: #7f8c8d; letter-spacing: 1px; }
 
-        /* --- Growth Indicator --- */
+        /* --- Momentum Indicator --- */
         .momentum-indicator {
             margin-top: 15px;
             font-size: 16px;
@@ -134,6 +134,9 @@
         }
         .region-item .val, .platform-item .val { font-size: 24px; font-weight: bold; color: var(--text-dark); display: block; }
         .region-item .lbl, .platform-item .lbl { font-size: 10px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; }
+
+        /* Platform WoW styles */
+        .platform-wow { font-size: 11px; margin-top: 6px; font-weight: bold; display: block; }
 
         /* --- Table Styling --- */
         .table-wrap { 
@@ -232,7 +235,7 @@
             <div id="momentumIndicator" class="momentum-indicator"></div>
         </div>
         <div class="analysis-card">
-            <h3>Orders by Platform</h3>
+            <h3>Orders by Platform (WoW Growth)</h3>
             <div id="platformStats" class="platform-stats"></div>
         </div>
         <div class="analysis-card">
@@ -267,6 +270,7 @@
 <script>
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTo_H6uUDOXjAILtefs-VU0oG-OxyLGMkxxBTgvkVjL-xtkOXKDpzewRtLQxTYg-2HfNoO6C3TuQa-H/pub?gid=1747140024&single=true&output=csv';
     let rawData = [];
+    let platformWoW = {}; // Global store for platform trends
 
     const fp = flatpickr("#datePicker", {
         mode: "range", dateFormat: "d/m/Y", onClose: processData
@@ -319,23 +323,35 @@
         const last7Days = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
         const prev7Days = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000));
 
-        const currentPeriodCount = rawData.filter(r => r.dtObj >= last7Days).length;
-        const previousPeriodCount = rawData.filter(r => r.dtObj >= prev7Days && r.dtObj < last7Days).length;
+        // Helper to get platform count in a period
+        const getStats = (start, end) => {
+            const range = rawData.filter(r => r.dtObj >= start && r.dtObj < end);
+            return {
+                total: range.length,
+                amazon: range.filter(r => r.pl.toLowerCase().includes('amazon')).length,
+                blinkit: range.filter(r => r.pl.toLowerCase().includes('blinkit')).length
+            };
+        };
 
-        let growthHtml = "";
-        if (previousPeriodCount > 0) {
-            const percentChange = ((currentPeriodCount - previousPeriodCount) / previousPeriodCount) * 100;
-            const isPositive = percentChange >= 0;
-            growthHtml = `
-                <span class="${isPositive ? 'growth-up' : 'growth-down'}">
-                    <i class="fa ${isPositive ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
-                    ${isPositive ? '+' : ''}${percentChange.toFixed(1)}% vs last 7 days
-                </span>
-            `;
-        } else {
-            growthHtml = `<span class="growth-up">Initial Momentum</span>`;
-        }
-        document.getElementById('momentumIndicator').innerHTML = growthHtml;
+        const current = getStats(last7Days, new Date(now.getTime() + 86400000));
+        const previous = getStats(prev7Days, last7Days);
+
+        // Overall Growth
+        const percentChange = previous.total > 0 ? ((current.total - previous.total) / previous.total * 100) : 0;
+        const isPositive = percentChange >= 0;
+        
+        document.getElementById('momentumIndicator').innerHTML = `
+            <span class="${isPositive ? 'growth-up' : 'growth-down'}">
+                <i class="fa ${isPositive ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+                ${isPositive ? '+' : ''}${percentChange.toFixed(1)}% vs last 7 days
+            </span>`;
+
+        // Store Platform WoW for render function
+        const calcPlatChange = (curr, prev) => prev > 0 ? ((curr - prev) / prev * 100).toFixed(0) : "0";
+        platformWoW = {
+            "Amazon": calcPlatChange(current.amazon, previous.amazon),
+            "Blinkit": calcPlatChange(current.blinkit, previous.blinkit)
+        };
     }
 
     function processData() {
@@ -352,7 +368,8 @@
             filtered = filtered.filter(r => r.dtObj >= startDate && r.dtObj <= endDate);
         }
         
-        filtered.sort((a, b) => b.dtObj - a.dtObj);
+        // SORTING: Oldest dates first (Ascending)
+        filtered.sort((a, b) => a.dtObj - b.dtObj);
         render(filtered);
     }
 
@@ -382,12 +399,20 @@
         });
 
         const platEntries = Object.entries(platCounts).sort((a,b) => b[1] - a[1]);
-        document.getElementById('platformStats').innerHTML = platEntries.map(p => `
-            <div class="platform-item">
-                <span class="val">${p[1]}</span>
-                <span class="lbl">${p[0]}</span>
-            </div>
-        `).join('');
+        document.getElementById('platformStats').innerHTML = platEntries.map(p => {
+            const wow = platformWoW[p[0]] || null;
+            const wowHtml = wow !== null ? `
+                <span class="platform-wow" style="color: ${wow >= 0 ? 'var(--growth-green)' : 'var(--decline-red)'}">
+                    ${wow >= 0 ? '↑' : '↓'} ${Math.abs(wow)}% WoW
+                </span>` : '';
+            return `
+                <div class="platform-item">
+                    <span class="val">${p[1]}</span>
+                    <span class="lbl">${p[0]}</span>
+                    ${wowHtml}
+                </div>
+            `;
+        }).join('');
 
         const top5 = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
         document.getElementById('regionList').innerHTML = top5.map(reg => `
