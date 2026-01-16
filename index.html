@@ -134,11 +134,14 @@
         .stats-item { 
             background: #f8f9fa; padding: 12px 15px; border-radius: 10px; 
             border-left: 4px solid var(--fedus-orange); flex: 1; min-width: 100px;
+            max-width: 100%; /* Ensure container doesn't exceed parent */
+            overflow: hidden;
         }
         .stats-item .val { font-size: 20px; font-weight: bold; color: var(--text-dark); display: block; }
         .stats-item .lbl { 
             font-size: 9px; color: #7f8c8d; font-weight: bold; 
             text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            display: block; width: 100%; cursor: help; /* Change cursor for hover hint */
         }
 
         /* Platform WoW styles */
